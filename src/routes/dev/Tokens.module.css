@@ -1,0 +1,212 @@
+.page {
+  max-width: calc(var(--size-content-max) * 2);
+  margin: 0 auto;
+  padding: var(--space-xxl) var(--space-lg) var(--space-xxxl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xxl);
+}
+
+.title {
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight-display);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-title);
+  line-height: var(--line-height-title);
+  margin-bottom: var(--space-lg);
+}
+
+.subTitle {
+  margin: var(--space-xl) 0 var(--space-md);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-caption);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.lead,
+.meta {
+  color: var(--color-text-secondary);
+}
+
+.meta {
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Colour panels: side by side on wide screens, stacked on phones. */
+.panels {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, calc(var(--size-content-max) / 2)), 1fr)
+  );
+  gap: var(--space-lg);
+}
+
+.panel {
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  border: var(--size-border) solid var(--color-border);
+}
+
+.panelTitle {
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-title);
+  text-transform: capitalize;
+  margin-bottom: var(--space-lg);
+}
+
+.swatches {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.swatch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.chip {
+  flex: none;
+  width: var(--size-min-tap);
+  height: var(--size-min-tap);
+  border-radius: var(--radius-md);
+  border: var(--size-border) solid var(--color-border);
+}
+
+.name {
+  font-weight: 600;
+}
+
+.habitRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.habit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.dot {
+  flex: none;
+  width: var(--space-xxl);
+  height: var(--space-xxl);
+  border-radius: var(--radius-pill);
+}
+
+.sampleCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.sampleText {
+  flex: 1;
+}
+
+.sampleButton {
+  min-height: var(--size-min-tap);
+  padding: 0 var(--space-lg);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.typeRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding-bottom: var(--space-md);
+  border-bottom: var(--size-border) solid var(--color-border);
+}
+
+.spaceRow {
+  display: grid;
+  grid-template-columns: calc(var(--space-xxxl) * 2) 1fr;
+  align-items: center;
+}
+
+.bar {
+  height: var(--space-lg);
+  background: var(--color-accent);
+  border-radius: var(--radius-sm);
+}
+
+.boxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+}
+
+.box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: calc(var(--space-xxxl) * 2);
+  height: calc(var(--space-xxxl) * 2);
+  background: var(--color-surface);
+  border: var(--size-border) solid var(--color-border);
+}
+
+.durationRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.play {
+  flex: none;
+  min-width: calc(var(--space-xxxl) * 3);
+  min-height: var(--size-min-tap);
+  padding: 0 var(--space-md);
+  border: var(--size-border) solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+.track {
+  flex: 1;
+  height: var(--space-xl);
+  position: relative;
+  container-type: inline-size;
+}
+
+.runner {
+  width: var(--space-xl);
+  height: var(--space-xl);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  transition-property: transform;
+  transition-timing-function: var(--easing-standard);
+  /* The track's width, so the dot can travel to its end. */
+  --track: 100cqw;
+}
