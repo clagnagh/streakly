@@ -33,6 +33,7 @@
 Streakly is a calm, beautiful habit tracker that runs in the browser and works entirely on your device, with no account and no internet needed after the first visit. On a phone, you "Add to Home Screen" and it opens full-screen like a normal app.
 
 **Main screens**
+
 - **Today:** a list of habits due today, each with a big tap-to-complete control, plus a progress ring for the day.
 - **Habit detail:** streak, calendar heatmap, stats, and history you can edit.
 - **All habits:** reorder, archive, edit.
@@ -44,12 +45,14 @@ Streakly is a calm, beautiful habit tracker that runs in the browser and works e
 **Business model:** Free forever for up to 3 habits. **Streakly Pro** unlocks unlimited habits, themes, streak freezes, full history, and data export. It's sold as a monthly and yearly subscription, plus a lifetime option, through RevenueCat Web Billing (which uses Stripe to take card payments). No app-store cut.
 
 ### Habit types
-| Type | Example | Completion means |
-|---|---|---|
-| Check | "Meditate" | Tapped once |
+
+| Type  | Example                    | Completion means               |
+| ----- | -------------------------- | ------------------------------ |
+| Check | "Meditate"                 | Tapped once                    |
 | Count | "Drink 8 glasses of water" | Count reaches the daily target |
 
 ### Schedules
+
 - **Daily:** due every day.
 - **Specific weekdays:** e.g. Mon/Wed/Fri.
 - **X times per week:** e.g. "3 times a week", where any 3 days count.
@@ -58,24 +61,25 @@ Streakly is a calm, beautiful habit tracker that runs in the browser and works e
 
 ## 3. Tech Stack & Conventions
 
-| Area | Choice |
-|---|---|
-| Framework | Vite + React 19 + TypeScript (strict). A static single-page app: no server. |
-| Routing | React Router (library mode) |
-| Offline & install | `vite-plugin-pwa` (service worker caches the app; web manifest makes it installable) |
-| Database | SQLite in the browser via `@sqlite.org/sqlite-wasm`, saved with the `opfs-sahpool` storage option, running in a Web Worker. Hand-written SQL and numbered migrations (no ORM, so I learn SQL). |
-| App state | Zustand (small store) — *ask me before installing* |
-| Animation | CSS transitions + the Web Animations API first; `motion` (Motion for React) only if CSS can't do it — *ask first* |
-| Haptics | `navigator.vibrate` where supported (Android). iPhones ignore it, so haptics are always a bonus, never required. |
-| Reminders | In-app only (see Milestone 5 for why) |
-| Payments | `@revenuecat/purchases-js` (RevenueCat Web Billing) |
-| Charts/heatmap | Custom SVG React components (no chart library) |
-| Tests | Vitest + `@testing-library/react` for logic and components; Playwright (Chromium) for end-to-end tests and screenshots. Core logic tests come first. |
-| DB tests | Node's built-in `node:sqlite` (Node 22.18+), behind the same small adapter the app uses, so the same SQL is tested in Node. No extra package. |
-| Lint/format | ESLint + typescript-eslint + Prettier, with `no-restricted-imports` and `no-restricted-globals` blocking React, the database and browser APIs inside `src/core/**` |
-| Hosting | GitHub Pages, deployed by a GitHub Actions workflow on every push to `main`. Any static host works (Netlify, Cloudflare Pages). |
+| Area              | Choice                                                                                                                                                                                         |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework         | Vite + React 19 + TypeScript (strict). A static single-page app: no server.                                                                                                                    |
+| Routing           | React Router (library mode)                                                                                                                                                                    |
+| Offline & install | `vite-plugin-pwa` (service worker caches the app; web manifest makes it installable)                                                                                                           |
+| Database          | SQLite in the browser via `@sqlite.org/sqlite-wasm`, saved with the `opfs-sahpool` storage option, running in a Web Worker. Hand-written SQL and numbered migrations (no ORM, so I learn SQL). |
+| App state         | Zustand (small store) — _ask me before installing_                                                                                                                                             |
+| Animation         | CSS transitions + the Web Animations API first; `motion` (Motion for React) only if CSS can't do it — _ask first_                                                                              |
+| Haptics           | `navigator.vibrate` where supported (Android). iPhones ignore it, so haptics are always a bonus, never required.                                                                               |
+| Reminders         | In-app only (see Milestone 5 for why)                                                                                                                                                          |
+| Payments          | `@revenuecat/purchases-js` (RevenueCat Web Billing)                                                                                                                                            |
+| Charts/heatmap    | Custom SVG React components (no chart library)                                                                                                                                                 |
+| Tests             | Vitest + `@testing-library/react` for logic and components; Playwright (Chromium) for end-to-end tests and screenshots. Core logic tests come first.                                           |
+| DB tests          | Node's built-in `node:sqlite` (Node 22.18+), behind the same small adapter the app uses, so the same SQL is tested in Node. No extra package.                                                  |
+| Lint/format       | ESLint + typescript-eslint + Prettier, with `no-restricted-imports` and `no-restricted-globals` blocking React, the database and browser APIs inside `src/core/**`                             |
+| Hosting           | GitHub Pages, deployed by a GitHub Actions workflow on every push to `main`. Any static host works (Netlify, Cloudflare Pages).                                                                |
 
 ### Project layout
+
 ```
 streakly/
 ├── index.html
@@ -90,7 +94,7 @@ streakly/
 │   │   ├── HabitDetail.tsx   # /habit/:id
 │   │   ├── HabitEdit.tsx     # /habit/new and /habit/:id/edit
 │   │   ├── Paywall.tsx
-│   │   └── dev/Tokens.tsx    # /dev/tokens (dev builds only)
+│   │   └── dev/Tokens.tsx    # /dev/tokens (hidden, unlinked; removed in Milestone 9)
 │   ├── theme/                # tokens.ts, themes.ts, typography.ts, tokens.css (CSS variables)
 │   ├── core/                 # PURE logic: no React, no DB, no browser APIs
 │   │   ├── dates.ts          # local day keys, day-start offset, week maths
@@ -114,6 +118,7 @@ streakly/
 ```
 
 ### Architecture rule
+
 Pages call store actions. The store calls repositories (the database) and the pure core. All habit rules — what's due, what counts as a streak — live in `src/core/` and are tested without a browser.
 
 ---
@@ -161,7 +166,7 @@ CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 --       last_backup_at
 ```
 
-**Why `day_key` rather than a timestamp:** habits belong to a *calendar day* as the user experiences it. Storing the local day as text avoids nearly every timezone bug.
+**Why `day_key` rather than a timestamp:** habits belong to a _calendar day_ as the user experiences it. Storing the local day as text avoids nearly every timezone bug.
 
 **Where the data lives:** in the browser's private file system for this site (OPFS), on this device only. Data isn't shared between browsers or devices; export/import moves it.
 
@@ -171,8 +176,8 @@ CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 
 - **Day start:** the "day" ends at `day_start_hour` (4 a.m. by default), so a task done at 1 a.m. counts for the previous day.
 - **Timezone travel:** flying between timezones must never delete or duplicate a completion. Day keys are computed from the device's current local time, and past records never change. Test case: done at 23:00 in New York, app opened next afternoon in Tokyo → yesterday stays done, today shows not done.
-- **Daily streaks:** counted in consecutive *due* days. A non-due day (e.g. Sunday for a Mon–Fri habit) neither continues nor breaks a streak.
-- **X-times-per-week streaks:** counted in consecutive *weeks* where the target was met. The current week counts as "in progress" and doesn't break a streak until it ends.
+- **Daily streaks:** counted in consecutive _due_ days. A non-due day (e.g. Sunday for a Mon–Fri habit) neither continues nor breaks a streak.
+- **X-times-per-week streaks:** counted in consecutive _weeks_ where the target was met. The current week counts as "in progress" and doesn't break a streak until it ends.
 - **Today doesn't break a streak.** A habit not yet done today still shows yesterday's streak, not zero.
 - **Count habits** show partial progress. A streak only counts days where the target was reached.
 - **Freezes (Pro):** a freeze on a missed due day keeps the streak alive. You get a limited number per month, refilled when `freezes_month` changes.
@@ -187,24 +192,26 @@ CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 ## 6. Milestones
 
 ### Milestone 0 — Project setup, design system & live site
-- [ ] Scaffold a Vite + React + TypeScript app with React Router, and run it with `npm run dev`.
-- [ ] Add Vitest, Playwright, ESLint, Prettier, and the lint rule blocking React, database and browser imports inside `src/core/**`. Show me the rule failing on a deliberate bad import, then remove it.
+
+- [x] Scaffold a Vite + React + TypeScript app with React Router, and run it with `npm run dev`.
+- [x] Add Vitest, Playwright, ESLint, Prettier, and the lint rule blocking React, database and browser imports inside `src/core/**`. Show me the rule failing on a deliberate bad import, then remove it.
 - [ ] Deploy to GitHub Pages with a GitHub Actions workflow, and give me the live URL. (Routing must work on GitHub Pages: use hash routes or a `404.html` fallback, and set Vite's `base` to the repo name.)
-- [ ] Build `src/theme/`:
+- [x] Build `src/theme/`:
   - **Colour tokens:** background, surface, text primary/secondary, accent, success, danger, plus 8 habit colours. Light and dark themes.
   - **Spacing scale:** 4, 8, 12, 16, 24, 32, 48.
   - **Type scale:** display, title, body, caption, with weights and line heights.
   - **Radii, shadows, breakpoints and animation durations** (fast 120 ms, normal 220 ms, slow 400 ms).
   - Tokens are written once in TypeScript and turned into CSS variables (`--color-accent`, `--space-4`), so components use `var(--space-4)`.
-- [ ] Create a hidden `/dev/tokens` page showing every token, so I can review the design system visually.
-- [ ] A Playwright script (`npm run screenshots`) that saves every page at phone and desktop widths, in light and dark mode.
-- [ ] Create `CLAUDE.md` with: stack, commands, the pure-core rule, the design-token rule, the screenshot protocol, "offline first", and "follow PLAN.md Working Agreement". Include a short **tone of voice** note: warm, calm, never guilt-tripping.
-- [ ] Create `LEARNINGS.md` with headings: *Prompts that worked / Prompts that didn't / Design feedback that worked / Concepts learned*.
+- [x] Create a hidden `/dev/tokens` page showing every token, so I can review the design system visually.
+- [x] A Playwright script (`npm run screenshots`) that saves every page at phone and desktop widths, in light and dark mode.
+- [x] Create `CLAUDE.md` with: stack, commands, the pure-core rule, the design-token rule, the screenshot protocol, "offline first", and "follow PLAN.md Working Agreement". Include a short **tone of voice** note: warm, calm, never guilt-tripping.
+- [x] Create `LEARNINGS.md` with headings: _Prompts that worked / Prompts that didn't / Design feedback that worked / Concepts learned_.
 
 **Done when:** I can open the live URL on my laptop and phone, and `/dev/tokens` looks good to me.
 **Explain to me:** what Vite does, what a single-page app and client-side routing are, and why design tokens beat hard-coded values.
 
 ### Milestone 1 — Core logic: dates, schedules, streaks
+
 - [ ] `dates.ts`: `dayKey(date, dayStartHour)`, `addDays`, `weekRange(date, weekStartsOn)`, and `daysBetween`.
 - [ ] `schedule.ts`: `isDueOn(habit, dayKey)` and `dueDaysIn(habit, range)`.
 - [ ] `streaks.ts`: `currentStreak(habit, completions, today)` and `bestStreak(...)`, covering all three schedule types and freezes.
@@ -216,6 +223,7 @@ CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 **Explain to me:** why we store local day keys instead of timestamps, and how to test time-dependent code by passing in "today".
 
 ### Milestone 2 — Database layer
+
 - [ ] `db/worker.ts`: load SQLite WASM in a Web Worker, open the database with `opfs-sahpool`, turn on foreign keys, and run numbered migrations tracked by `schema_version`.
 - [ ] `db/client.ts`: a small typed message layer so the app can call the worker with `await`.
 - [ ] `db/adapter.ts`: one tiny interface (`exec`, `all`, `get`, `transaction`) with two versions: the browser worker, and `node:sqlite` for tests.
@@ -229,7 +237,9 @@ CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 **Explain to me:** migrations and why they matter after release, why the database runs in a Web Worker, and why a repository layer helps.
 
 ### Milestone 3 — Working app (function before beauty)
+
 Plain, unstyled components only.
+
 - [ ] Zustand store that loads habits and today's completions, with actions: `toggleComplete`, `incrementCount`, `createHabit`, `updateHabit`, `archiveHabit`, and `setCompletionForDay`.
 - [ ] **Today page:** habit list, tap to complete, tap-and-hold (or a +/− stepper) for count habits, and a day progress indicator.
 - [ ] **New/edit habit page:** name, emoji, colour, type, target, schedule, reminder time.
@@ -243,6 +253,7 @@ Plain, unstyled components only.
 **My checkpoint:** I'll send a screenshot, and you follow the screenshot protocol.
 
 ### Milestone 4 — Visual design & motion
+
 - [ ] Redesign every page using the tokens: Today as a card list, a big satisfying complete control with a fill animation, and a day progress ring.
 - [ ] Responsive layout: bottom tab bar on phones, sidebar on desktop. Respect the phone's safe areas (notch and home bar) when installed.
 - [ ] Empty states with warm, encouraging copy. Loading skeletons.
@@ -253,9 +264,10 @@ Plain, unstyled components only.
 
 **Done when:** I'm happy with how it looks and feels on my real phone and laptop. Decided by screenshot rounds, not tests.
 **Explain to me:** why animating `transform` and `opacity` is smooth but animating `width` or `top` is not, and what makes a tap feel responsive.
-**🎓 My checkpoint (design feedback experiment):** I'll first ask *"make Today look nicer"*, then ask for something specific like *"increase card padding to spacing.lg, drop the shadow, use a 2 px accent border on completed rows"*. I'll write the difference in the results into `LEARNINGS.md`.
+**🎓 My checkpoint (design feedback experiment):** I'll first ask _"make Today look nicer"_, then ask for something specific like _"increase card padding to spacing.lg, drop the shadow, use a 2 px accent border on completed rows"_. I'll write the difference in the results into `LEARNINGS.md`.
 
 ### Milestone 5 — Installable app & reminders
+
 - [ ] Web manifest (name, icons, theme colour, `display: standalone`) and a service worker that caches the whole app, so it opens with no network.
 - [ ] An "Install Streakly" prompt: the browser's install button on Android/desktop Chrome, and "Share → Add to Home Screen" instructions on iPhone. Shown after the user has completed a habit, not on first visit.
 - [ ] "A new version is ready — refresh" banner when the service worker updates.
@@ -268,6 +280,7 @@ Plain, unstyled components only.
 **Explain to me:** what a service worker is, what makes a web app "installable", and the difference between local and push notifications.
 
 ### Milestone 6 — Stats & heatmap
+
 - [ ] A custom SVG heatmap component: a year of days, colour intensity by completion, horizontally scrollable on phones, with month labels.
 - [ ] Habit detail: current streak, best streak, completion rate, per-weekday bar chart, and total completions.
 - [ ] Stats page: an overall heatmap across all habits, this week's summary, and a "best day of the week" insight.
@@ -277,6 +290,7 @@ Plain, unstyled components only.
 **Explain to me:** basic SVG in React, and memoisation (why recalculating stats on every render is a problem).
 
 ### Milestone 7 — Settings, onboarding, backup & accessibility
+
 - [ ] Onboarding: 3 friendly screens, then create the first habit. It runs only once.
 - [ ] Settings: theme, week start, day-start hour, haptics, reminders, and contact.
 - [ ] Export to a JSON file download (Pro), and import from a file with a preview of what will change and a confirmation.
@@ -288,6 +302,7 @@ Plain, unstyled components only.
 **Explain to me:** why accessibility labels matter and how they're tested, and why an import needs a preview step.
 
 ### Milestone 8 — Monetisation (RevenueCat Web Billing)
+
 - [ ] `purchases/` wrapper with a `FakePurchases` implementation for development, so I can test both free and Pro without real payments. A dev-only switch flips between them.
 - [ ] Paywall page: the benefits, monthly/yearly/lifetime options, the yearly saving shown clearly, restore purchases, and links to terms and privacy. No dark patterns.
 - [ ] Enforce free limits via `core/limits.ts`: 3 active habits, no themes, no export, no freezes. Show the paywall when a limit is hit, with a clear reason.
@@ -299,6 +314,7 @@ Plain, unstyled components only.
 **Explain to me:** how web subscriptions work, what RevenueCat and Stripe each do, and why the fake implementation speeds up development.
 
 ### Milestone 9 — Ship it
+
 - [ ] Custom domain (e.g. `streakly.app`) pointed at the host, with HTTPS.
 - [ ] Final manifest, app icons (including a maskable icon and an Apple touch icon), and social share images (Open Graph).
 - [ ] A simple landing page at `/` for new visitors (what it is, screenshots, "Open Streakly"), with the app itself at `/app`.
@@ -317,11 +333,13 @@ Plain, unstyled components only.
 ## 7. Final Review (after Milestone 9)
 
 Claude, please do these three things:
+
 1. Review the codebase: find any rules that leaked out of `core/`, any hard-coded colours or spacing outside the theme, and any bugs. List findings by severity before fixing.
 2. Suggest 5 changes most likely to improve day-7 retention and free-to-paid conversion.
 3. Quiz me with 10 questions about how the app works, then correct my answers.
 
 ## 8. Stretch Goals (plan separately)
+
 - **Web push reminders** (needs a small server and push subscriptions, so it changes the "no server" story).
 - **Cloud sync** as a separate Pro tier (needs accounts and a backend).
 - **Accountability partners** (needs a backend, so it changes the offline-only privacy story).

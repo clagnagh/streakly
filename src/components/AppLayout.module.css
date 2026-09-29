@@ -1,0 +1,11 @@
+.shell {
+  min-height: 100dvh;
+}
+
+.main {
+  max-width: var(--size-content-max);
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-lg);
+  /* Leave room for the fixed tab bar and the phone's home-bar area. */
+  padding-bottom: calc(var(--size-tab-bar) + var(--space-xl) + env(safe-area-inset-bottom));
+}
