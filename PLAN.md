@@ -187,6 +187,17 @@ CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 - **Storage failures** (storage blocked, quota full, private browsing, a second tab holding the database) show a friendly message and never crash the app.
 - **Two tabs open:** only one tab may own the database at a time. A second tab shows "Streakly is open in another tab" with a button to switch here.
 
+**Decisions made in Milestone 1** (A–H):
+
+- **A.** A freeze bridges a missed day but doesn't add to the streak.
+- **B.** Doing a habit on a day it isn't due doesn't add to the streak, but counts in total completions.
+- **C.** For "X times a week" habits, one freeze saves a whole missed week.
+- **D.** A weekly habit's first (partial) week can't break its streak; it only counts if the target is met.
+- **E.** A habit's history starts on its created day, or its earliest backfilled completion if that's earlier.
+- **F.** Weekly completion rate uses finished weeks (completions ÷ target, capped at 100%); the current week counts once met.
+- **G.** Free: 3 active habits, 30 days of history. Pro: 2 freezes a month.
+- **H.** Over the free limit, habits after the first 3 active ones (in the user's order) become read-only.
+
 ---
 
 ## 6. Milestones
@@ -195,7 +206,7 @@ CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 
 - [x] Scaffold a Vite + React + TypeScript app with React Router, and run it with `npm run dev`.
 - [x] Add Vitest, Playwright, ESLint, Prettier, and the lint rule blocking React, database and browser imports inside `src/core/**`. Show me the rule failing on a deliberate bad import, then remove it.
-- [ ] Deploy to GitHub Pages with a GitHub Actions workflow, and give me the live URL. (Routing must work on GitHub Pages: use hash routes or a `404.html` fallback, and set Vite's `base` to the repo name.)
+- [x] Deploy to GitHub Pages with a GitHub Actions workflow, and give me the live URL. (Routing must work on GitHub Pages: use hash routes or a `404.html` fallback, and set Vite's `base` to the repo name.)
 - [x] Build `src/theme/`:
   - **Colour tokens:** background, surface, text primary/secondary, accent, success, danger, plus 8 habit colours. Light and dark themes.
   - **Spacing scale:** 4, 8, 12, 16, 24, 32, 48.
@@ -212,12 +223,12 @@ CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 
 ### Milestone 1 — Core logic: dates, schedules, streaks
 
-- [ ] `dates.ts`: `dayKey(date, dayStartHour)`, `addDays`, `weekRange(date, weekStartsOn)`, and `daysBetween`.
-- [ ] `schedule.ts`: `isDueOn(habit, dayKey)` and `dueDaysIn(habit, range)`.
-- [ ] `streaks.ts`: `currentStreak(habit, completions, today)` and `bestStreak(...)`, covering all three schedule types and freezes.
-- [ ] `stats.ts`: completion rate over a range, per-weekday breakdown, and heatmap buckets.
-- [ ] `limits.ts`: free-versus-Pro rules in one place.
-- [ ] Tests for every rule in section 5, including the 1 a.m. case, timezone travel, and "today doesn't break a streak".
+- [x] `dates.ts`: `dayKey(date, dayStartHour, timeZone)`, `addDays`, `weekRange(date, weekStartsOn)`, and `daysBetween`.
+- [x] `schedule.ts`: `isDueOn(habit, dayKey)` and `dueDaysIn(habit, range)`.
+- [x] `streaks.ts`: `currentStreak(habit, completions, today)` and `bestStreak(...)`, covering all three schedule types and freezes.
+- [x] `stats.ts`: completion rate over a range, per-weekday breakdown, and heatmap buckets.
+- [x] `limits.ts`: free-versus-Pro rules in one place.
+- [x] Tests for every rule in section 5, including the 1 a.m. case, timezone travel, and "today doesn't break a streak".
 
 **Done when:** all core tests pass with no React, database or browser involved.
 **Explain to me:** why we store local day keys instead of timestamps, and how to test time-dependent code by passing in "today".
