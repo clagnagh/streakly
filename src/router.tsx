@@ -6,6 +6,7 @@ import { Habits } from './routes/Habits.tsx';
 import { Stats } from './routes/Stats.tsx';
 import { Settings } from './routes/Settings.tsx';
 import { Tokens } from './routes/dev/Tokens.tsx';
+import { Database } from './routes/dev/Database.tsx';
 
 // Hash URLs (…/streakly/#/stats) because GitHub Pages can't send every path to
 // index.html. We can switch to createBrowserRouter on a host that can (Milestone 9).
@@ -21,6 +22,7 @@ export const router = createHashRouter([
       { path: 'settings', Component: Settings },
     ],
   },
-  // Hidden design-system page: not linked anywhere. Removed before launch (Milestone 9).
+  // Hidden developer pages: not linked anywhere. Removed before launch (Milestone 9).
   { path: '/dev/tokens', Component: Tokens },
+  { path: '/dev/db', Component: Database },
 ]);

@@ -9,4 +9,9 @@ export default defineConfig({
   plugins: [react()],
   server: { port: 5173 },
   preview: { port: 4173 },
+  // SQLite WASM finds its .wasm file next to its own script; Vite's
+  // pre-bundling would move the script and break that, so leave it alone.
+  optimizeDeps: { exclude: ['@sqlite.org/sqlite-wasm'] },
+  // The database worker (src/db/worker.ts) uses `import`, so build it as a module.
+  worker: { format: 'es' },
 });

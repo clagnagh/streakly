@@ -58,8 +58,20 @@ to a custom domain.
   a network request.
 - **Accessibility.** Every tap target is at least `--size-min-tap` (44 px). Respect
   `prefers-reduced-motion`: replace movement with fades.
-- **Hidden dev page:** `#/dev/tokens` shows every token. Unlinked; remove before launch
-  (Milestone 9).
+- **Database.** SQLite (WASM) runs in a Web Worker (`src/db/worker.ts`) on OPFS storage
+  (`opfs-sahpool`). The app talks to it through the async `Db` interface (`src/db/adapter.ts`):
+  `get`, `all`, `run`, and `batch` for atomic multi-statement writes. Tests use the same interface
+  on `node:sqlite` (`src/db/nodeAdapter.ts`, tests only). Repositories (`habitsRepo`,
+  `completionsRepo`, `settingsRepo`) hold all SQL and return core types. Use `?` parameters, never
+  string-built values.
+- **Migrations.** Schema changes are new numbered entries in `src/db/schema.ts`; never edit a
+  migration that has shipped. The version lives in `PRAGMA user_version`. Add a test for each one.
+- **One tab at a time.** `src/db/tabLock.ts` (Web Locks + BroadcastChannel) decides which tab owns
+  the database; `src/db/connection.ts` tracks its state for `useDatabase()`.
+- **Clock in, not read.** Repositories take `today`/`now` as arguments; only pages and the store
+  read the real clock.
+- **Hidden dev pages:** `#/dev/tokens` (every token) and `#/dev/db` (counts, sample data, read-only
+  SQL box). Unlinked; remove before launch (Milestone 9).
 - Don't edit `LEARNINGS.md` unless asked.
 
 ## Tone of voice

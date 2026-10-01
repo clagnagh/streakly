@@ -5,4 +5,5 @@ export const pages = [
   { name: 'stats', path: '#/stats', heading: 'Stats' },
   { name: 'settings', path: '#/settings', heading: 'Settings' },
   { name: 'dev-tokens', path: '#/dev/tokens', heading: 'Design tokens' },
+  { name: 'dev-db', path: '#/dev/db', heading: 'Database' },
 ];
