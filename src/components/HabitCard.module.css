@@ -1,0 +1,104 @@
+.card {
+  --habit: var(--color-accent);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-md) var(--space-md) var(--space-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Just completed: a small dip and settle. */
+.card[data-settle='true'] {
+  animation: settle var(--duration-slow) var(--easing-standard);
+}
+
+@keyframes settle {
+  50% {
+    transform: scale(calc(1 - (1 - var(--scale-settle)) * var(--motion)));
+  }
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--size-min-tap);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  color: inherit;
+  text-decoration: none;
+  transition: opacity var(--duration-slow) var(--easing-standard);
+}
+
+/* Done habits step back a little so the open ones stand out. */
+.card[data-done='true'] .main {
+  opacity: var(--opacity-completed);
+}
+
+.badge {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-badge);
+  height: var(--size-badge);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-title);
+  color: var(--habit);
+  isolation: isolate;
+}
+
+/* A soft tint of the habit's colour behind the emoji. */
+.badge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--habit);
+  opacity: var(--opacity-tint);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  font-weight: var(--font-weight-title);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-caption);
+  line-height: var(--line-height-caption);
+}
+
+.minus {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-min-tap);
+  height: var(--size-min-tap);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-background);
+  color: var(--color-text-secondary);
+  font-size: var(--size-icon);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.minus:active {
+  transform: scale(calc(1 - (1 - var(--scale-press)) * var(--motion)));
+}

@@ -4,25 +4,25 @@ import styles from './Page.module.css';
 type Props = {
   title: string;
   subtitle?: string;
+  /** Something to show at the right of the title (e.g. the progress ring). */
+  aside?: ReactNode;
   children?: ReactNode;
 };
 
 /** Page title plus content, the same on every tab. */
-export function Page({ title, subtitle, children }: Props) {
+export function Page({ title, subtitle, aside, children }: Props) {
   return (
     <section className={styles.page}>
       <header className={styles.header}>
-        <h1 className={styles.title}>{title}</h1>
-        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+        <div className={styles.headings}>
+          <h1 className={styles.title}>{title}</h1>
+          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+        </div>
+        {aside}
       </header>
       {children}
     </section>
   );
-}
-
-/** A soft placeholder card, used until each page gets its real content. */
-export function EmptyCard({ children }: { children: ReactNode }) {
-  return <div className={styles.empty}>{children}</div>;
 }
 
 /** A titled card for grouping things on a page (e.g. a Settings section). */

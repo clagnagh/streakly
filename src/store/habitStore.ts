@@ -14,6 +14,8 @@ import {
   countOn,
   emptyHistory,
   isComplete,
+  milestoneReached,
+  streaks,
   withCount,
   type DayKey,
   type HabitHistory,
@@ -22,7 +24,7 @@ import {
 import { DbError } from '../db/client.ts';
 import type { HabitInput } from '../db/habitsRepo.ts';
 import type { Repos } from '../db/repos.ts';
-import { settingDefaults, type Settings } from '../db/settingsRepo.ts';
+import { settingDefaults, type SettingKey, type Settings } from '../db/settingsRepo.ts';
 import { todayFrom, type Clock } from './clock.ts';
 
 export type HabitState = {
@@ -34,6 +36,14 @@ export type HabitState = {
   histories: Record<string, HabitHistory>;
   /** A friendly message after a failed save, until dismissed. */
   error: string | null;
+  /** Set when a tap takes a streak past a milestone (7, 30, 100, 365). */
+  celebration: Celebration | null;
+};
+
+export type Celebration = {
+  habitId: string;
+  milestone: number;
+  unit: 'days' | 'weeks';
 };
 
 export type HabitActions = {
@@ -53,6 +63,8 @@ export type HabitActions = {
   /** Saves a new order for the active habits: ids from first to last. */
   reorderHabits(ids: readonly string[]): Promise<void>;
   dismissError(): void;
+  dismissCelebration(): void;
+  setSetting<K extends SettingKey>(key: K, value: Settings[K]): Promise<void>;
 };
 
 export type HabitStore = HabitState & HabitActions;
@@ -85,14 +97,30 @@ export function createHabitStore(repos: Repos, clock: Clock) {
     const historyOf = (id: string) => get().histories[id] ?? emptyHistory;
     const now = () => clock.now().toISOString();
 
+    // Milestones already celebrated this session, so unticking and ticking
+    // again doesn't celebrate twice.
+    const celebrated = new Set<string>();
+
     async function setCount(habitId: string, day: DayKey, count: number) {
-      const { today, histories } = get();
+      const { today, histories, habits, settings } = get();
       if (!canEditDay(day, today)) return; // no future days
+      const habit = habits.find((h) => h.id === habitId);
       const next = Math.max(0, Math.round(count));
-      await optimistic(
-        { histories: { ...histories, [habitId]: withCount(historyOf(habitId), day, next) } },
-        () => repos.completions.setCount(habitId, day, next, now()),
-      );
+      const before = historyOf(habitId);
+      const after = withCount(before, day, next);
+
+      const change: Partial<HabitState> = { histories: { ...histories, [habitId]: after } };
+      if (habit) {
+        const was = streaks(habit, before, today, settings.weekStartsOn).current;
+        const is = streaks(habit, after, today, settings.weekStartsOn).current;
+        const milestone = milestoneReached(was.count, is.count);
+        const key = `${habitId}:${milestone}`;
+        if (milestone && !celebrated.has(key)) {
+          celebrated.add(key);
+          change.celebration = { habitId, milestone, unit: is.unit };
+        }
+      }
+      await optimistic(change, () => repos.completions.setCount(habitId, day, next, now()));
     }
 
     function replaceHabit(id: string, patch: Partial<HabitRecord>) {
@@ -106,6 +134,7 @@ export function createHabitStore(repos: Repos, clock: Clock) {
       habits: [],
       histories: {},
       error: null,
+      celebration: null,
 
       async load() {
         const [settings, habits, histories] = await Promise.all([
@@ -188,6 +217,21 @@ export function createHabitStore(repos: Repos, clock: Clock) {
 
       dismissError() {
         set({ error: null });
+      },
+
+      dismissCelebration() {
+        set({ celebration: null });
+      },
+
+      async setSetting(key, value) {
+        const settings = get().settings;
+        await optimistic(
+          {
+            settings: { ...settings, [key]: value },
+            ...(key === 'dayStartHour' && { today: todayFrom(clock, value as number) }),
+          },
+          () => repos.settings.set(key, value),
+        );
       },
     };
   });

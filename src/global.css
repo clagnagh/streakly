@@ -1,5 +1,32 @@
 /* Base styles for the whole page. Values come only from theme variables. */
 
+@font-face {
+  font-family: Nunito;
+  font-style: normal;
+  font-weight: 200 1000;
+  /* Show system text at once and swap in Nunito when it arrives (it's cached after the first visit). */
+  font-display: swap;
+  src: url('/fonts/nunito-variable.woff2') format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/*
+ * --motion is 1 normally and 0 when someone asks their device to reduce
+ * motion. Movement (scale, slide) is multiplied by it, so it disappears;
+ * fades and colour changes don't use it, so they stay.
+ */
+:root {
+  --motion: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion: 0;
+  }
+}
+
 *,
 *::before,
 *::after {
@@ -35,7 +62,9 @@ a {
   color: var(--color-accent);
 }
 
-button {
+button,
+input,
+textarea {
   font: inherit;
   color: inherit;
 }
@@ -45,11 +74,34 @@ button {
   outline-offset: var(--size-focus-ring);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 1ms !important;
-    transition-duration: 1ms !important;
+/* Page transitions (View Transitions API): a short fade with a small rise. */
+::view-transition-old(root) {
+  animation: page-out var(--duration-fast) var(--easing-standard) both;
+}
+
+::view-transition-new(root) {
+  animation: page-in var(--duration-normal) var(--easing-standard) both;
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
   }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--space-sm) * var(--motion)));
+  }
+}
+
+/* Visually hidden but read by screen readers. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }

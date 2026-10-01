@@ -1,31 +1,23 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
-import { HabitControl } from '../components/HabitControl.tsx';
+import { EmptyState } from '../components/EmptyState.tsx';
+import { HabitCard } from '../components/HabitCard.tsx';
+import { PlusIcon } from '../components/Icons.tsx';
 import { Page } from '../components/Page.tsx';
-import { formatDay, streakLabel } from '../format.ts';
+import { ProgressRing } from '../components/ProgressRing.tsx';
+import { formatDay } from '../format.ts';
 import { useHabitStore } from '../store/context.tsx';
-import { activeHabits, dayProgress, todayItems, type TodayItem } from '../store/selectors.ts';
+import { activeHabits, dayProgress, todayItems } from '../store/selectors.ts';
 import ui from '../components/ui.module.css';
 import styles from './Today.module.css';
 
-function HabitRow({ item }: { item: TodayItem }) {
-  const { habit, week, streak } = item;
-  const notes = [week && `${week.done} of ${week.times} this week`, streakLabel(streak)].filter(
-    Boolean,
-  );
-  return (
-    <li className={styles.row} data-testid="today-row" data-habit={habit.name}>
-      <Link to={`/habit/${habit.id}`} className={styles.name}>
-        <span aria-hidden="true">{habit.emoji}</span>
-        <span>
-          <span className={styles.title}>{habit.name}</span>
-          {notes.length > 0 && <span className={ui.muted}>{notes.join(' · ')}</span>}
-        </span>
-      </Link>
-      <HabitControl habit={habit} count={item.count} done={item.done} />
-    </li>
-  );
+/** A calm line under the date, depending on how the day is going. */
+function dayMessage(done: number, total: number) {
+  if (total === 0) return '';
+  if (done === total) return 'All done for today. Rest well.';
+  if (done === 0) return 'A fresh day. Start with whichever feels easiest.';
+  return `${total - done} to go. Nice and steady.`;
 }
 
 export function Today() {
@@ -45,42 +37,50 @@ export function Today() {
   const hasHabits = activeHabits(habits).length > 0;
 
   return (
-    <Page title="Today" subtitle={formatDay(today)}>
+    <Page
+      title="Today"
+      subtitle={formatDay(today)}
+      aside={items.length > 0 && <ProgressRing done={progress.done} total={progress.total} />}
+    >
       {items.length > 0 && (
-        <div className={ui.stack}>
-          <label className={ui.muted} htmlFor="day-progress" data-testid="day-progress">
-            {progress.done} of {progress.total} done
-          </label>
-          <progress
-            id="day-progress"
-            className={styles.progress}
-            max={progress.total}
-            value={progress.done}
-          />
-        </div>
+        <p className={styles.message} data-testid="day-progress" aria-live="polite">
+          <span className="sr-only">
+            {progress.done} of {progress.total} done.{' '}
+          </span>
+          {dayMessage(progress.done, progress.total)}
+        </p>
       )}
 
       {items.length > 0 ? (
         <ul className={styles.list}>
           {items.map((item) => (
-            <HabitRow key={item.habit.id} item={item} />
+            <HabitCard key={item.habit.id} item={item} />
           ))}
         </ul>
+      ) : hasHabits ? (
+        <EmptyState title="Nothing due today">
+          Enjoy the rest. Your habits will be back tomorrow.
+        </EmptyState>
       ) : (
-        <div className={ui.card}>
-          {hasHabits ? (
-            <p>Nothing due today. Enjoy the rest.</p>
-          ) : (
-            <p>Start with one small habit. Something you could do even on a busy day.</p>
-          )}
-        </div>
+        <EmptyState
+          title="Start with one small habit"
+          action={
+            <Link to="/habit/new" className={ui.primary} viewTransition>
+              <PlusIcon /> New habit
+            </Link>
+          }
+        >
+          Something you could do even on a busy day. You can always add more later.
+        </EmptyState>
       )}
 
-      <div className={ui.row}>
-        <Link to="/habit/new" className={hasHabits ? ui.button : ui.primary}>
-          New habit
-        </Link>
-      </div>
+      {hasHabits && (
+        <div className={ui.row}>
+          <Link to="/habit/new" className={ui.button} viewTransition>
+            <PlusIcon /> New habit
+          </Link>
+        </div>
+      )}
     </Page>
   );
 }

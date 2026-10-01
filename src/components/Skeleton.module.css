@@ -1,0 +1,63 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* A slow, gentle pulse (a fade, so it's fine with reduced motion too). */
+.block {
+  background: var(--color-border);
+  border-radius: var(--radius-sm);
+  animation: pulse calc(var(--duration-slow) * 4) var(--easing-standard) infinite alternate;
+}
+
+@keyframes pulse {
+  to {
+    opacity: 0.45;
+  }
+}
+
+.heading {
+  width: 40%;
+  height: var(--font-size-display);
+  margin-bottom: var(--space-lg);
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-md) var(--space-md) var(--space-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.badge {
+  width: var(--size-badge);
+  height: var(--size-badge);
+  border-radius: var(--radius-md);
+}
+
+.lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.line {
+  width: 60%;
+  height: var(--space-lg);
+}
+
+.short {
+  width: 35%;
+  height: var(--space-md);
+}
+
+.circle {
+  width: var(--size-complete-button);
+  height: var(--size-complete-button);
+  border-radius: var(--radius-pill);
+}

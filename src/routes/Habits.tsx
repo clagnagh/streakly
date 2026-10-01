@@ -1,4 +1,4 @@
-import { useRef, useState, type PointerEvent } from 'react';
+import { useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { Link } from 'react-router';
 import { Page } from '../components/Page.tsx';
 import type { HabitRecord } from '../core/index.ts';
@@ -6,6 +6,8 @@ import { scheduleLabel } from '../format.ts';
 import { useActions, useHabitStore } from '../store/context.tsx';
 import { activeHabits, archivedHabits } from '../store/selectors.ts';
 import { habitColor } from '../theme/index.ts';
+import { ChevronDownIcon, ChevronUpIcon, GripIcon, PlusIcon } from '../components/Icons.tsx';
+import { EmptyState } from '../components/EmptyState.tsx';
 import ui from '../components/ui.module.css';
 import styles from './Habits.module.css';
 
@@ -75,9 +77,7 @@ export function Habits() {
   return (
     <Page title="Habits">
       {active.length === 0 ? (
-        <div className={ui.card}>
-          <p>No habits yet. Add one to get started.</p>
-        </div>
+        <EmptyState title="No habits yet">Add one to get started. Small is perfect.</EmptyState>
       ) : (
         <ol className={styles.list} aria-label="Your habits, in order">
           {drag.order.map((id, index) => {
@@ -98,31 +98,40 @@ export function Habits() {
                   onPointerUp={drag.onPointerUp}
                   onPointerCancel={drag.onPointerUp}
                 >
-                  ⠿
+                  <GripIcon />
                 </button>
-                <span className={styles.dot} style={{ background: habitColor(h.colorKey) }} />
-                <Link to={`/habit/${id}`} className={styles.name}>
-                  <span>
-                    {h.emoji} {h.name}
+                <Link to={`/habit/${id}`} className={styles.name} viewTransition>
+                  <span
+                    className={styles.badge}
+                    style={{ '--habit': habitColor(h.colorKey) } as CSSProperties}
+                    aria-hidden="true"
+                  >
+                    {h.emoji || h.name.slice(0, 1).toUpperCase()}
                   </span>
-                  <span className={ui.muted}>{scheduleLabel(h.schedule, weekStartsOn)}</span>
+                  <span className={styles.text}>
+                    <span className={styles.title}>{h.name}</span>
+                    <span className={ui.muted}>{scheduleLabel(h.schedule, weekStartsOn)}</span>
+                  </span>
                 </Link>
-                <button
-                  className={ui.iconButton}
-                  aria-label={`Move ${h.name} up`}
-                  disabled={index === 0}
-                  onClick={() => void reorderHabits(move(ids, index, -1))}
-                >
-                  ↑
-                </button>
-                <button
-                  className={ui.iconButton}
-                  aria-label={`Move ${h.name} down`}
-                  disabled={index === ids.length - 1}
-                  onClick={() => void reorderHabits(move(ids, index, 1))}
-                >
-                  ↓
-                </button>
+                {/* Keyboard reordering: hidden until a keyboard focuses this row (touch uses the handle). */}
+                <span className={styles.arrows}>
+                  <button
+                    className={ui.iconButton}
+                    aria-label={`Move ${h.name} up`}
+                    disabled={index === 0}
+                    onClick={() => void reorderHabits(move(ids, index, -1))}
+                  >
+                    <ChevronUpIcon />
+                  </button>
+                  <button
+                    className={ui.iconButton}
+                    aria-label={`Move ${h.name} down`}
+                    disabled={index === ids.length - 1}
+                    onClick={() => void reorderHabits(move(ids, index, 1))}
+                  >
+                    <ChevronDownIcon />
+                  </button>
+                </span>
                 <button className={ui.button} onClick={() => void archiveHabit(id)}>
                   Archive
                 </button>
@@ -133,8 +142,8 @@ export function Habits() {
       )}
 
       <div className={ui.row}>
-        <Link to="/habit/new" className={ui.primary}>
-          New habit
+        <Link to="/habit/new" className={ui.primary} viewTransition>
+          <PlusIcon /> New habit
         </Link>
       </div>
 
@@ -146,9 +155,14 @@ export function Habits() {
             {archived.map((h) => (
               <li key={h.id} className={styles.row} data-testid="archived-row">
                 <Link to={`/habit/${h.id}`} className={styles.name}>
-                  <span>
-                    {h.emoji} {h.name}
+                  <span
+                    className={styles.badge}
+                    style={{ '--habit': habitColor(h.colorKey) } as CSSProperties}
+                    aria-hidden="true"
+                  >
+                    {h.emoji || h.name.slice(0, 1).toUpperCase()}
                   </span>
+                  <span className={styles.title}>{h.name}</span>
                 </Link>
                 <button className={ui.button} onClick={() => void unarchiveHabit(h.id)}>
                   Restore

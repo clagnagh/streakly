@@ -56,8 +56,20 @@ to a custom domain.
   colours ≥ 3:1 on surface).
 - **Offline first.** Every feature works in airplane mode after the first visit. Nothing blocks on
   a network request.
-- **Accessibility.** Every tap target is at least `--size-min-tap` (44 px). Respect
-  `prefers-reduced-motion`: replace movement with fades.
+- **Accessibility.** Every tap target is at least `--size-min-tap` (44 px);
+  `e2e/design.spec.ts` checks it. Keyboard-only controls (the ↑/↓ reorder buttons) appear on focus.
+- **Motion.** Durations, easings, scales (`--scale-press`, `--scale-pop`, `--scale-settle`) and
+  opacities are tokens. Animate only `transform` and `opacity` (and SVG strokes). Multiply every
+  movement by `var(--motion)` (1 normally, 0 with reduced motion), e.g.
+  `scale(calc(1 - (1 - var(--scale-press)) * var(--motion)))`, so reduced motion keeps fades but
+  removes movement. Page changes use View Transitions (`viewTransition` on links).
+- **Layout.** `useLayoutAttribute()` sets `data-layout="phone|desktop"` on `<html>` at
+  `breakpoints.desktop`; CSS uses `:global([data-layout='desktop'])` (no media-query pixels).
+  Respect safe areas with `env(safe-area-inset-*)`.
+- **Font.** Nunito variable font, bundled in `public/fonts/` (SIL OFL, licence alongside).
+- **Feel.** Haptics go through `haptic(kind, enabled)` in `src/feedback/haptics.ts` and respect the
+  `hapticsEnabled` setting; they're a bonus (iPhones ignore them). Theme choice is applied by
+  `applyTheme()` (`src/feedback/theme.ts`); localStorage only mirrors it to avoid a flash on load.
 - **Database.** SQLite (WASM) runs in a Web Worker (`src/db/worker.ts`) on OPFS storage
   (`opfs-sahpool`). The app talks to it through the async `Db` interface (`src/db/adapter.ts`):
   `get`, `all`, `run`, and `batch` for atomic multi-statement writes. Tests use the same interface

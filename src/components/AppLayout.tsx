@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
 import { Outlet } from 'react-router';
-import { useActions } from '../store/context.tsx';
+import { useLayoutAttribute } from '../feedback/layout.ts';
+import { applyTheme } from '../feedback/theme.ts';
+import { useActions, useHabitStore } from '../store/context.tsx';
+import { Celebration } from './Celebration.tsx';
 import { DbGate } from './DbGate.tsx';
 import { TabBar } from './TabBar.tsx';
 import styles from './AppLayout.module.css';
@@ -29,12 +32,22 @@ function DayRollover() {
   return null;
 }
 
+/** Keeps the page's theme in step with the saved setting. */
+function ThemeSync() {
+  const theme = useHabitStore((s) => s.settings.theme);
+  useEffect(() => applyTheme(theme), [theme]);
+  return null;
+}
+
 export function AppLayout() {
+  useLayoutAttribute();
   return (
     <div className={styles.shell}>
       <main className={styles.main}>
         <DbGate>
           <DayRollover />
+          <ThemeSync />
+          <Celebration />
           <Outlet />
         </DbGate>
       </main>
