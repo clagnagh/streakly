@@ -1,0 +1,120 @@
+/* Plain shared styles for Milestone 3 ("function before beauty").
+   Milestone 4 redesigns everything; only tokens are used here. */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  border: var(--size-border) solid var(--color-border);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.muted {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+}
+
+.h2 {
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-title);
+  line-height: var(--line-height-title);
+}
+
+.button,
+.primary,
+.danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-height: var(--size-min-tap);
+  min-width: var(--size-min-tap);
+  padding: 0 var(--space-lg);
+  border-radius: var(--radius-pill);
+  border: var(--size-border) solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: var(--font-weight-title);
+}
+
+.danger {
+  color: var(--color-danger);
+}
+
+.button:disabled,
+.primary:disabled,
+.danger:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.iconButton {
+  composes: button;
+  padding: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.label {
+  font-weight: var(--font-weight-title);
+  padding: 0;
+}
+
+.input {
+  min-height: var(--size-min-tap);
+  padding: 0 var(--space-md);
+  border: var(--size-border) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font: inherit;
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: var(--font-size-caption);
+}
+
+/* A toggle button that shows its on/off state (aria-pressed). */
+.toggle {
+  composes: button;
+  padding: 0 var(--space-md);
+}
+
+.toggle[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}

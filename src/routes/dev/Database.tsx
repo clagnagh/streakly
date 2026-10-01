@@ -5,7 +5,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { dayKey } from '../../core/index.ts';
 import type { Row } from '../../db/adapter.ts';
 import { DbError } from '../../db/client.ts';
-import { takeOverFromOtherTab, type Connection } from '../../db/connection.ts';
+import type { Connection } from '../../db/connection.ts';
+import { DbStatus } from '../../components/DbStatus.tsx';
 import { clearAll, tableCounts, TABLES } from '../../db/devTools.ts';
 import { seedDevData } from '../../db/seed.ts';
 import { useDatabase } from '../../hooks/useDatabase.ts';
@@ -178,36 +179,7 @@ export function Database() {
         <p className={styles.meta}>Everything here is stored in this browser only.</p>
       </header>
 
-      {(state.status === 'idle' || state.status === 'opening') && (
-        <p className={styles.meta}>Opening…</p>
-      )}
-
-      {(state.status === 'otherTab' || state.status === 'movedAway') && (
-        <section className={styles.card} role="status">
-          <h2 className={styles.h2}>
-            {state.status === 'otherTab'
-              ? 'Streakly is open in another tab'
-              : 'Streakly moved to another tab'}
-          </h2>
-          <p className={styles.meta}>
-            To keep your habits safe, Streakly works in one tab at a time.
-          </p>
-          <div className={styles.buttons}>
-            <button className={styles.primary} onClick={takeOverFromOtherTab}>
-              Use it here
-            </button>
-          </div>
-        </section>
-      )}
-
-      {state.status === 'error' && (
-        <section className={styles.card} role="alert">
-          <h2 className={styles.h2}>We couldn't open your habits</h2>
-          <p>{state.error.friendly}</p>
-          <p className={styles.meta}>Details: {state.error.message}</p>
-        </section>
-      )}
-
+      {state.status !== 'ready' && <DbStatus state={state} />}
       {state.status === 'ready' && <Ready connection={state.connection} />}
     </main>
   );

@@ -1,0 +1,16 @@
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.count {
+  min-width: calc(var(--space-xxxl) + var(--space-lg));
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.count[data-done='true'] {
+  color: var(--color-success);
+  font-weight: var(--font-weight-title);
+}

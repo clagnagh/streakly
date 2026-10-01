@@ -253,13 +253,13 @@ CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 
 Plain, unstyled components only.
 
-- [ ] Zustand store that loads habits and today's completions, with actions: `toggleComplete`, `incrementCount`, `createHabit`, `updateHabit`, `archiveHabit`, and `setCompletionForDay`.
-- [ ] **Today page:** habit list, tap to complete, tap-and-hold (or a +/− stepper) for count habits, and a day progress indicator.
-- [ ] **New/edit habit page:** name, emoji, colour, type, target, schedule, reminder time.
-- [ ] **Habit detail:** streak numbers, last 30 days as a simple grid, and tap a past day to toggle it.
-- [ ] **All habits:** list with drag-to-reorder (plus up/down buttons for keyboard users) and archive.
-- [ ] Refresh "today" when the tab becomes visible again, so a tab left open overnight rolls over to the new day.
-- [ ] Playwright test: create a habit, complete it, reload, and it's still complete.
+- [x] Zustand store that loads habits and today's completions, with actions: `toggleComplete`, `incrementCount`, `createHabit`, `updateHabit`, `archiveHabit`, and `setCompletionForDay` (plus `unarchiveHabit`, `deleteHabit` and `reorderHabits`).
+- [x] **Today page:** habit list, tap to complete, a +/− stepper for count habits (tap-and-hold is a Milestone 4 feel detail), and a day progress indicator.
+- [x] **New/edit habit page:** name, emoji, colour, type, target, schedule, reminder time.
+- [x] **Habit detail:** streak numbers, last 30 days as a simple grid, and tap a past day to toggle it.
+- [x] **All habits:** list with drag-to-reorder (plus up/down buttons for keyboard users) and archive.
+- [x] Refresh "today" when the tab becomes visible again, so a tab left open overnight rolls over to the new day.
+- [x] Playwright test: create a habit, complete it, reload, and it's still complete.
 
 **Done when:** I can create habits, complete them, edit past days, and see streaks update correctly — at the live URL.
 **Explain to me:** how the store connects pages to the database, optimistic updates, and why the UI reads state instead of calculating rules itself.

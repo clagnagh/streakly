@@ -55,6 +55,24 @@ export function completionsRepo(db: Db) {
       return { completions, freezes: freezes.map((f) => f.dayKey) };
     },
 
+    /** Every habit's history at once (the store loads this at start). */
+    async allHistories(): Promise<Record<string, HabitHistory>> {
+      const [completions, freezes] = await Promise.all([
+        db.all<Completion & { habitId: string }>(
+          'SELECT habit_id AS habitId, day_key AS dayKey, count FROM completions ORDER BY day_key',
+        ),
+        db.all<{ habitId: string; dayKey: DayKey }>(
+          'SELECT habit_id AS habitId, day_key AS dayKey FROM freezes ORDER BY day_key',
+        ),
+      ]);
+      const out: Record<string, { completions: Completion[]; freezes: DayKey[] }> = {};
+      const entry = (id: string) => (out[id] ??= { completions: [], freezes: [] });
+      for (const c of completions)
+        entry(c.habitId).completions.push({ dayKey: c.dayKey, count: c.count });
+      for (const f of freezes) entry(f.habitId).freezes.push(f.dayKey);
+      return out;
+    },
+
     /** Progress for every habit on one day (for Today). */
     async onDay(day: DayKey): Promise<DayProgress[]> {
       return db.all<DayProgress>(
