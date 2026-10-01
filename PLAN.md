@@ -139,8 +139,9 @@ CREATE TABLE habits (
   times_per_week  INTEGER,
   reminder_time   TEXT,                      -- "08:30" local, NULL = none
   sort_order      INTEGER NOT NULL,
-  archived_at     TEXT,
-  created_at      TEXT NOT NULL
+  created_day     TEXT NOT NULL,             -- local day key it was created (the rules use this)
+  archived_day    TEXT,                      -- local day key it was archived, NULL = active
+  created_at      TEXT NOT NULL              -- ISO timestamp, for the record
 );
 
 CREATE TABLE completions (
@@ -160,10 +161,11 @@ CREATE TABLE freezes (                       -- Pro: protect a streak on a misse
 );
 
 CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
--- keys: theme, day_start_hour (default 4), week_starts_on (0=Sun,1=Mon),
---       haptics_enabled, reminders_enabled, schema_version, onboarded_at,
---       freezes_remaining, freezes_month ("YYYY-MM", refills when it changes),
---       last_backup_at
+-- keys (values stored as JSON; defaults in src/db/settingsRepo.ts):
+--   theme, dayStartHour (4), weekStartsOn (0=Sun, 1=Mon), hapticsEnabled,
+--   remindersEnabled, onboardedAt, freezeAllowance ({remaining, month} — refills
+--   when the month changes), lastBackupAt, plan
+-- The schema version is SQLite's PRAGMA user_version, not a setting.
 ```
 
 **Why `day_key` rather than a timestamp:** habits belong to a _calendar day_ as the user experiences it. Storing the local day as text avoids nearly every timezone bug.
@@ -235,14 +237,14 @@ CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 
 ### Milestone 2 — Database layer
 
-- [ ] `db/worker.ts`: load SQLite WASM in a Web Worker, open the database with `opfs-sahpool`, turn on foreign keys, and run numbered migrations tracked by `schema_version`.
-- [ ] `db/client.ts`: a small typed message layer so the app can call the worker with `await`.
-- [ ] `db/adapter.ts`: one tiny interface (`exec`, `all`, `get`, `transaction`) with two versions: the browser worker, and `node:sqlite` for tests.
-- [ ] Repositories: `habitsRepo`, `completionsRepo`, and `settingsRepo`, with typed functions and no SQL leaking outside `db/`.
-- [ ] Ask the browser for persistent storage (`navigator.storage.persist()`), and show the result in Settings.
-- [ ] A one-tab lock (Web Locks API) so two tabs never write at once.
-- [ ] A `seedDevData()` function (dev only) that creates 5 habits with 90 days of realistic history.
-- [ ] Tests against an in-memory database: migrations, cascade delete, and the unique constraint on (habit, day).
+- [x] `db/worker.ts`: load SQLite WASM in a Web Worker, open the database with `opfs-sahpool`, turn on foreign keys, and run numbered migrations tracked by `PRAGMA user_version`.
+- [x] `db/client.ts`: a small typed message layer so the app can call the worker with `await`.
+- [x] `db/adapter.ts`: one tiny interface (`get`, `all`, `run`, `batch`) with two versions: the browser worker, and `node:sqlite` for tests.
+- [x] Repositories: `habitsRepo`, `completionsRepo`, and `settingsRepo`, with typed functions and no SQL leaking outside `db/`.
+- [x] Ask the browser for persistent storage (`navigator.storage.persist()`), and show the result in Settings.
+- [x] A one-tab lock (Web Locks API) so two tabs never write at once.
+- [x] A `seedDevData()` function (dev only) that creates 5 habits with 90 days of realistic history.
+- [x] Tests against an in-memory database: migrations, cascade delete, and the unique constraint on (habit, day).
 
 **Done when:** the dev seed loads in the browser, survives a page reload, and I can query it from a test.
 **Explain to me:** migrations and why they matter after release, why the database runs in a Web Worker, and why a repository layer helps.

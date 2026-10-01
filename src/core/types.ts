@@ -41,3 +41,18 @@ export type HabitHistory = {
 };
 
 export type Plan = 'free' | 'pro';
+
+/** A habit as the app stores and shows it: the rules' view plus display details. */
+export type HabitRecord = Habit & {
+  name: string;
+  emoji: string | null;
+  /** A key into the theme's habit colours, never a hex value. */
+  colorKey: string;
+  /** For count habits: "glasses", "pages". */
+  unit: string | null;
+  /** "08:30" local time, or null for no reminder. */
+  reminderTime: string | null;
+  sortOrder: number;
+  /** ISO timestamp, for the record. The rules use `createdDay`. */
+  createdAt: string;
+};

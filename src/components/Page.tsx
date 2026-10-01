@@ -24,3 +24,13 @@ export function Page({ title, subtitle, children }: Props) {
 export function EmptyCard({ children }: { children: ReactNode }) {
   return <div className={styles.empty}>{children}</div>;
 }
+
+/** A titled card for grouping things on a page (e.g. a Settings section). */
+export function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className={styles.section}>
+      <h2 className={styles.sectionTitle}>{title}</h2>
+      {children}
+    </section>
+  );
+}
