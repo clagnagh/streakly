@@ -68,8 +68,16 @@ to a custom domain.
   migration that has shipped. The version lives in `PRAGMA user_version`. Add a test for each one.
 - **One tab at a time.** `src/db/tabLock.ts` (Web Locks + BroadcastChannel) decides which tab owns
   the database; `src/db/connection.ts` tracks its state for `useDatabase()`.
-- **Clock in, not read.** Repositories take `today`/`now` as arguments; only pages and the store
-  read the real clock.
+- **Store.** `src/store/habitStore.ts` (Zustand) holds habits, histories, settings and `today`.
+  Pages read it with `useHabitStore(selector)` (use `useShallow` when picking several fields) and
+  call actions from `useActions()`. Derived screen data comes from `src/store/selectors.ts`, which
+  calls the core rules; wrap it in `useMemo`. Writes are optimistic: update state, save, and roll
+  back with a friendly `error` (shown by `<Toast>`) if the save fails.
+- **Clock in, not read.** Only `src/store/clock.ts` reads the real clock (`systemClock`); the store
+  refreshes `today` on focus, on tab visibility and every minute. Repositories take `today`/`now`
+  as arguments. Tests pass a fixed clock; e2e tests use `page.clock`.
+- **Screen text** (dates, schedules, streaks) comes from `src/format.ts`. Shared plain button/form
+  styles are in `src/components/ui.module.css`.
 - **Hidden dev pages:** `#/dev/tokens` (every token) and `#/dev/db` (counts, sample data, read-only
   SQL box). Unlinked; remove before launch (Milestone 9).
 - Don't edit `LEARNINGS.md` unless asked.

@@ -150,6 +150,11 @@ describe('completions', () => {
     expect(await completions.onDay(TODAY)).toHaveLength(2);
     expect(await completions.between({ start: '2026-09-28', end: '2026-09-29' })).toHaveLength(1);
 
+    expect(await completions.allHistories()).toEqual({
+      [a.id]: await completions.history(a.id),
+      [b.id]: { completions: [{ dayKey: TODAY, count: 1 }], freezes: [] },
+    });
+
     await completions.removeFreeze(a.id, '2026-09-29');
     expect((await completions.history(a.id)).freezes).toEqual([]);
   });

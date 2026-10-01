@@ -1,0 +1,31 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.emojiInput {
+  width: calc(var(--space-xxxl) * 2);
+}
+
+.number {
+  width: calc(var(--space-xxxl) + var(--space-xl));
+}
+
+.swatch {
+  width: var(--size-min-tap);
+  height: var(--size-min-tap);
+  border-radius: var(--radius-pill);
+  border: var(--size-focus-ring) solid transparent;
+  cursor: pointer;
+}
+
+.swatch[aria-pressed='true'] {
+  outline: var(--size-focus-ring) solid var(--color-text-primary);
+  outline-offset: var(--size-focus-ring);
+}
+
+.dangerZone {
+  padding-top: var(--space-lg);
+  border-top: var(--size-border) solid var(--color-border);
+}

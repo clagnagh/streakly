@@ -5,3 +5,4 @@ export * from './schedule.ts';
 export * from './streaks.ts';
 export * from './stats.ts';
 export * from './limits.ts';
+export * from './history.ts';

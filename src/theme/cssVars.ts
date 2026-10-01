@@ -78,3 +78,8 @@ export function buildThemeCss(): string {
     themeBlock('[data-theme="dark"]', themes.dark),
   ].join('\n\n');
 }
+
+/** The CSS colour for a habit's saved colour key (falls back to the accent). */
+export function habitColor(key: string): string {
+  return (vars.habit as Record<string, string>)[key] ?? vars.color.accent;
+}
