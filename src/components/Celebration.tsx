@@ -1,3 +1,4 @@
+import { displayName } from '../format.ts';
 import { useEffect, type CSSProperties } from 'react';
 import { haptic } from '../feedback/haptics.ts';
 import { useActions, useHabitStore } from '../store/context.tsx';
@@ -44,7 +45,7 @@ export function Celebration() {
       </div>
       <div className={styles.card} role="status" aria-live="polite">
         <span className={styles.number}>{celebration.milestone}</span>
-        <p>{celebrationText(habit.name, celebration.milestone, celebration.unit)}</p>
+        <p>{celebrationText(displayName(habit.name), celebration.milestone, celebration.unit)}</p>
       </div>
     </div>
   );

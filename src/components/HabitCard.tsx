@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Link } from 'react-router';
-import { streakLabel } from '../format.ts';
+import { streakLabel, displayName } from '../format.ts';
 import { haptic } from '../feedback/haptics.ts';
 import { useActions, useHabitStore } from '../store/context.tsx';
 import type { TodayItem } from '../store/selectors.ts';
@@ -45,7 +45,7 @@ export function HabitCard({ item }: { item: TodayItem }) {
           {habit.emoji || habit.name.slice(0, 1).toUpperCase()}
         </span>
         <span className={styles.text}>
-          <span className={styles.name}>{habit.name}</span>
+          <span className={styles.name}>{displayName(habit.name)}</span>
           {notes.length > 0 && <span className={styles.meta}>{notes.join(' · ')}</span>}
         </span>
       </Link>

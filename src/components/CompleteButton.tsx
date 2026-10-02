@@ -1,3 +1,4 @@
+import { displayName } from '../format.ts';
 import { useState, type CSSProperties } from 'react';
 import type { DayKey, HabitRecord } from '../core/index.ts';
 import { haptic } from '../feedback/haptics.ts';
@@ -43,7 +44,7 @@ export function CompleteButton({ habit, count, done, day }: Props) {
 
   const label = isCount
     ? `One more ${habit.unit ?? ''}`.trim()
-    : `${habit.name}: ${done ? 'done' : 'not done'}`;
+    : `${displayName(habit.name)}: ${done ? 'done' : 'not done'}`;
 
   return (
     <button

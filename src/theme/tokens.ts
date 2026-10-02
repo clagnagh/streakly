@@ -63,11 +63,13 @@ export const sizes = {
 /** Opacity levels. */
 export const opacity = {
   /** Completed habits fade back a little so open ones stand out. */
-  completed: 0.62,
+  completed: 0.75,
   /** Disabled controls. */
   disabled: 0.45,
   /** The faint tint behind a habit's emoji. */
   tint: 0.16,
+  /** The outline ring of a not-yet-done complete button. */
+  track: 0.5,
 } as const;
 
 /** Scale factors for press and pop animations (1 = normal size). */

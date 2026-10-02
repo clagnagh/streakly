@@ -61,3 +61,10 @@ export function isWeekend(day: DayKey) {
   const d = weekdayOf(day);
   return d === 0 || d === 6;
 }
+
+/** A habit name as shown on screen: first letter capitalised ("meditate" → "Meditate"). The saved name is unchanged. */
+export function displayName(name: string): string {
+  // Leave deliberate lowercase starts alone, like "iPhone-free hour".
+  if (/^\p{Ll}\p{Lu}/u.test(name)) return name;
+  return name.charAt(0).toLocaleUpperCase() + name.slice(1);
+}

@@ -37,3 +37,13 @@ describe('screen text', () => {
     );
   });
 });
+
+describe('habit names on screen', () => {
+  it('capitalise the first letter without changing the rest', async () => {
+    const { displayName } = await import('../src/format.ts');
+    expect(displayName('meditate')).toBe('Meditate');
+    expect(displayName('work out')).toBe('Work out');
+    expect(displayName('iPhone-free hour')).toBe('iPhone-free hour');
+    expect(displayName('')).toBe('');
+  });
+});

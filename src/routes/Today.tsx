@@ -75,11 +75,9 @@ export function Today() {
       )}
 
       {hasHabits && (
-        <div className={ui.row}>
-          <Link to="/habit/new" className={ui.button} viewTransition>
-            <PlusIcon /> New habit
-          </Link>
-        </div>
+        <Link to="/habit/new" className={styles.addCard} viewTransition>
+          <PlusIcon /> New habit
+        </Link>
       )}
     </Page>
   );
