@@ -35,7 +35,7 @@ test('create a habit, complete it, reload: still complete', async ({ page }) => 
     'aria-pressed',
     'true',
   );
-  await expect(page.getByTestId('day-progress')).toHaveText('1 of 1 done');
+  await expect(page.getByTestId('day-progress')).toContainText('1 of 1 done');
   await expect(row(page, 'Meditate')).toContainText('1-day streak');
 
   await page.reload();
@@ -52,9 +52,9 @@ test('count habits step up to their target and back down', async ({ page }) => {
   await more.click();
   await more.click();
   await expect(row(page, 'Water')).toContainText('2 / 3');
-  await expect(page.getByTestId('day-progress')).toHaveText('0 of 1 done');
+  await expect(page.getByTestId('day-progress')).toContainText('0 of 1 done');
   await more.click();
-  await expect(page.getByTestId('day-progress')).toHaveText('1 of 1 done');
+  await expect(page.getByTestId('day-progress')).toContainText('1 of 1 done');
   await page.getByRole('button', { name: 'One less glasses' }).click();
   await expect(row(page, 'Water')).toContainText('2 / 3');
   await page.reload();
@@ -112,7 +112,10 @@ test('reorder, archive and restore habits', async ({ page }) => {
     .poll(names)
     .toEqual([expect.stringContaining('Alpha'), expect.stringContaining('Beta')]);
 
-  await page.getByRole('button', { name: 'Move Beta up' }).click();
+  // Keyboard users: the arrow buttons appear when focused, and Enter presses them.
+  await page.getByRole('button', { name: 'Move Beta up' }).focus();
+  await expect(page.getByRole('button', { name: 'Move Beta up' })).toBeVisible();
+  await page.keyboard.press('Enter');
   await expect
     .poll(names)
     .toEqual([expect.stringContaining('Beta'), expect.stringContaining('Alpha')]);
@@ -141,6 +144,8 @@ test('drag to reorder with the handle', async ({ page }) => {
   await addHabit(page, 'Second');
   await page.getByRole('link', { name: 'Habits' }).click();
   const handle = page.getByRole('button', { name: 'Drag to reorder Second' });
+  // Wait until the page transition has finished and the handle can be touched.
+  await handle.hover();
   const target = page.getByTestId('habit-row').first();
   const from = (await handle.boundingBox())!;
   const to = (await target.boundingBox())!;

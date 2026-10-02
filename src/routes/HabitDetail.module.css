@@ -6,43 +6,73 @@
 
 .stats strong {
   font-size: var(--font-size-title);
-  font-weight: var(--font-weight-title);
+  font-weight: var(--font-weight-display);
 }
 
 .grid {
+  --habit: var(--color-accent);
   display: grid;
   grid-template-columns: repeat(7, minmax(var(--size-min-tap), 1fr));
   gap: var(--space-xs);
 }
 
+.weekday {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-caption);
+}
+
 .cell {
+  position: relative;
   min-height: var(--size-min-tap);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
-  border-radius: var(--radius-sm);
-  border: var(--size-border) solid var(--color-border);
+  border-radius: var(--radius-md);
+  border: none;
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-title);
   cursor: pointer;
+  isolation: isolate;
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.cell:active {
+  transform: scale(calc(1 - (1 - var(--scale-press)) * var(--motion)));
+}
+
+/* Colour layer: full habit colour when done, a tint when partly done. */
+.cell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--habit);
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--easing-standard);
 }
 
 .cell[data-state='done'] {
-  color: var(--color-on-accent);
-  border-color: transparent;
-  font-weight: var(--font-weight-title);
+  color: var(--color-surface);
 }
 
-.cell[data-state='partial'] {
-  opacity: 0.55;
-  color: var(--color-on-accent);
+.cell[data-state='done']::before {
+  opacity: 1;
+}
+
+.cell[data-state='partial']::before {
+  opacity: calc(var(--opacity-tint) * 2.5);
 }
 
 .cell[data-state='off'] {
   color: var(--color-text-secondary);
-  background: var(--color-background);
+  background: transparent;
+  font-weight: var(--font-weight-body);
 }
 
 .cell[aria-pressed='true'] {

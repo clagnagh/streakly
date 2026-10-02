@@ -1,19 +1,27 @@
+/* Phone: a bar along the bottom, above the home-bar area. */
 .bar {
   position: fixed;
   inset: auto 0 0 0;
+  z-index: 10;
   display: flex;
   justify-content: space-around;
   height: calc(var(--size-tab-bar) + env(safe-area-inset-bottom));
-  padding-bottom: env(safe-area-inset-bottom);
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   background: var(--color-surface);
   border-top: var(--size-border) solid var(--color-border);
+}
+
+.brand {
+  display: none;
 }
 
 .tab {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: var(--space-xs);
   min-height: var(--size-min-tap);
   color: var(--color-text-secondary);
   font-size: var(--font-size-caption);
@@ -22,6 +30,55 @@
   transition: color var(--duration-fast) var(--easing-standard);
 }
 
+.icon {
+  display: flex;
+  font-size: var(--size-icon);
+  transition: transform var(--duration-fast) var(--easing-spring);
+}
+
+.tab:active .icon {
+  transform: scale(calc(1 - (1 - var(--scale-press)) * var(--motion)));
+}
+
 .active {
   color: var(--color-accent);
+}
+
+/* Desktop: a sidebar on the left. */
+:global([data-layout='desktop']) .bar {
+  inset: 0 auto 0 0;
+  width: var(--size-sidebar);
+  height: auto;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: var(--space-xs);
+  padding: var(--space-xl) var(--space-md);
+  border-top: none;
+  border-right: var(--size-border) solid var(--color-border);
+}
+
+:global([data-layout='desktop']) .brand {
+  display: block;
+  padding: 0 var(--space-md) var(--space-xl);
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-display);
+  color: var(--color-accent);
+}
+
+:global([data-layout='desktop']) .tab {
+  flex: none;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: var(--space-md);
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-body);
+}
+
+:global([data-layout='desktop']) .tab:hover {
+  background: var(--color-background);
+}
+
+:global([data-layout='desktop']) .active {
+  background: var(--color-background);
 }

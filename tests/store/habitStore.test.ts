@@ -192,3 +192,38 @@ describe('selectors on the sample data', () => {
     expect(p.total).toBe(5);
   });
 });
+
+describe('celebrations and settings', () => {
+  it('celebrates once when a tap reaches a 7-day streak', async () => {
+    const { s } = await setup();
+    const h = await s().createHabit(input());
+    for (const day of ['24', '25', '26', '27', '28', '29']) {
+      await s().setCompletionForDay(h.id, `2026-09-${day}`, 1);
+    }
+    expect(s().celebration).toBeNull(); // 6 days: not yet
+    await s().toggleComplete(h.id);
+    expect(s().celebration).toEqual({ habitId: h.id, milestone: 7, unit: 'days' });
+
+    s().dismissCelebration();
+    await s().toggleComplete(h.id); // untick
+    await s().toggleComplete(h.id); // tick again
+    expect(s().celebration).toBeNull();
+  });
+
+  it('saves settings and keeps them after a reload', async () => {
+    const { s, reload } = await setup();
+    await s().setSetting('theme', 'dark');
+    await s().setSetting('hapticsEnabled', false);
+    expect(s().settings).toMatchObject({ theme: 'dark', hapticsEnabled: false });
+    expect((await reload()).settings).toMatchObject({ theme: 'dark', hapticsEnabled: false });
+  });
+
+  it('changing the day-start hour moves today straight away', async () => {
+    const { s, setClock } = await setup();
+    setClock('2026-10-01T03:30:00Z'); // 04:30 in London
+    s().refreshToday();
+    expect(s().today).toBe('2026-10-01');
+    await s().setSetting('dayStartHour', 6);
+    expect(s().today).toBe('2026-09-30');
+  });
+});

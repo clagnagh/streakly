@@ -2,7 +2,7 @@
 // write var(--space-lg) instead of 16px. `vars` gives the same names to code,
 // e.g. style={{ gap: vars.space.lg }}.
 
-import { durations, easings, radii, sizes, spacing } from './tokens.ts';
+import { durations, easings, opacity, radii, scales, sizes, spacing } from './tokens.ts';
 import { themes, type Theme } from './themes.ts';
 import { fontFamily, typeScale } from './typography.ts';
 
@@ -26,6 +26,8 @@ export const vars = {
   duration: mapVars('duration', durations),
   easing: mapVars('easing', easings),
   size: mapVars('size', sizes),
+  opacity: mapVars('opacity', opacity),
+  scale: mapVars('scale', scales),
 };
 
 function declarations(entries: [string, string][]): string {
@@ -49,6 +51,8 @@ function staticEntries(): [string, string][] {
     ...Object.entries(durations).map(([k, v]): [string, string] => [`duration-${k}`, `${v}ms`]),
     ...Object.entries(easings).map(([k, v]): [string, string] => [`easing-${k}`, v]),
     ...Object.entries(sizes).map(([k, v]): [string, string] => [`size-${kebab(k)}`, px(v)]),
+    ...Object.entries(opacity).map(([k, v]): [string, string] => [`opacity-${k}`, String(v)]),
+    ...Object.entries(scales).map(([k, v]): [string, string] => [`scale-${k}`, String(v)]),
     ...Object.entries(typeScale).flatMap(([k, t]): [string, string][] => [
       [`font-size-${k}`, px(t.size)],
       [`font-weight-${k}`, String(t.weight)],

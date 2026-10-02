@@ -3,7 +3,15 @@ import { Link, useParams } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
 import { HabitControl } from '../components/HabitControl.tsx';
 import { Page } from '../components/Page.tsx';
-import { formatDay, scheduleLabel, streakLength } from '../format.ts';
+import {
+  formatDay,
+  scheduleLabel,
+  streakLength,
+  weekdayShort,
+  weekdaysInOrder,
+} from '../format.ts';
+import { weekdayOf } from '../core/index.ts';
+import type { CSSProperties } from 'react';
 import { useHabitStore } from '../store/context.tsx';
 import { habitDetail, type DayCell } from '../store/selectors.ts';
 import { habitColor } from '../theme/index.ts';
@@ -48,6 +56,8 @@ export function HabitDetail() {
   }
 
   const selectedDay = selected ?? today;
+  // Blank cells before the first day, so each column is one weekday.
+  const lead = (weekdayOf(detail.cells[0]!.day) - weekStartsOn + 7) % 7;
   const selectedCell = detail.cells.find((c) => c.day === selectedDay) ?? detail.cells.at(-1)!;
   const { current, best } = detail.streaks;
 
@@ -70,7 +80,20 @@ export function HabitDetail() {
       <section className={ui.stack}>
         <h2 className={ui.h2}>Last 30 days</h2>
         <p className={ui.muted}>Tap a day to change it.</p>
-        <div className={styles.grid} role="group" aria-label="Last 30 days">
+        <div
+          className={styles.grid}
+          role="group"
+          aria-label="Last 30 days"
+          style={{ '--habit': habitColor(habit.colorKey) } as CSSProperties}
+        >
+          {weekdaysInOrder(weekStartsOn).map((d) => (
+            <span key={d} className={styles.weekday} aria-hidden="true">
+              {weekdayShort(d).slice(0, 1)}
+            </span>
+          ))}
+          {Array.from({ length: lead }, (_, i) => (
+            <span key={`lead-${i}`} aria-hidden="true" />
+          ))}
           {detail.cells.map((cell) => (
             <button
               key={cell.day}

@@ -1,9 +1,12 @@
-import { EmptyCard, Page } from '../components/Page.tsx';
+import { EmptyState } from '../components/EmptyState.tsx';
+import { Page } from '../components/Page.tsx';
 
 export function Stats() {
   return (
     <Page title="Stats">
-      <EmptyCard>Your progress will grow here, one day at a time.</EmptyCard>
+      <EmptyState title="Your progress will grow here">
+        A year at a glance, your best days and your longest streaks, one day at a time.
+      </EmptyState>
     </Page>
   );
 }

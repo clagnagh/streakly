@@ -1,0 +1,107 @@
+.button {
+  --habit: var(--color-accent);
+  position: relative;
+  flex: none;
+  width: var(--size-complete-button);
+  height: var(--size-complete-button);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: none;
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.button svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Pressed: shrink a little (not at all with reduced motion). */
+.button:active {
+  transform: scale(calc(1 - (1 - var(--scale-press)) * var(--motion)));
+}
+
+/* Just completed: overshoot and spring back. */
+.button[data-pop='true'] {
+  animation: pop var(--duration-slow) var(--easing-spring);
+}
+
+@keyframes pop {
+  40% {
+    transform: scale(calc(1 + (var(--scale-pop) - 1) * var(--motion)));
+  }
+}
+
+.track {
+  fill: none;
+  stroke: var(--habit);
+  stroke-width: var(--size-complete-ring);
+  opacity: 0.35;
+}
+
+.progress {
+  fill: none;
+  stroke: var(--habit);
+  stroke-width: var(--size-complete-ring);
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dashoffset var(--duration-normal) var(--easing-standard);
+}
+
+/* The fill grows from the centre when done. With reduced motion it fades in instead. */
+.fill {
+  fill: var(--habit);
+  transform-origin: center;
+  transform: scale(calc(1 - var(--motion)));
+  opacity: 0;
+  transition:
+    transform var(--duration-normal) var(--easing-spring),
+    opacity var(--duration-fast) var(--easing-standard);
+}
+
+.button[data-done='true'] .fill {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* The tick draws itself just after the fill. */
+.tick {
+  fill: none;
+  stroke: var(--habit);
+  stroke-width: var(--size-complete-ring);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  opacity: 0.35;
+  transition:
+    stroke-dashoffset var(--duration-normal) var(--easing-standard) var(--duration-fast),
+    stroke var(--duration-fast) var(--easing-standard);
+}
+
+.button[data-done='true'] .tick {
+  stroke: var(--color-surface);
+  opacity: 1;
+  animation: draw var(--duration-normal) var(--easing-standard) var(--duration-fast) both;
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+.count {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-display);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}

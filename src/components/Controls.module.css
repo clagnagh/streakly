@@ -1,0 +1,74 @@
+.switchRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  width: 100%;
+  min-height: var(--size-min-tap);
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.switch {
+  position: relative;
+  flex: none;
+  width: calc(var(--size-min-tap) + var(--space-sm));
+  height: calc(var(--space-xl) + var(--space-xs));
+  border-radius: var(--radius-pill);
+  background: var(--color-border);
+  transition: background var(--duration-fast) var(--easing-standard);
+}
+
+.knob {
+  position: absolute;
+  top: calc(var(--space-xs) / 2);
+  left: calc(var(--space-xs) / 2);
+  width: var(--space-xl);
+  height: var(--space-xl);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  /* With reduced motion the knob jumps instead of sliding; the colour still fades. */
+  transition: transform calc(var(--duration-normal) * var(--motion)) var(--easing-spring);
+}
+
+.switchRow[aria-checked='true'] .switch {
+  background: var(--color-accent);
+}
+
+.switchRow[aria-checked='true'] .knob {
+  transform: translateX(
+    calc(var(--size-min-tap) + var(--space-sm) - var(--space-xl) - var(--space-xs))
+  );
+}
+
+.segmented {
+  display: flex;
+  padding: var(--space-xs);
+  gap: var(--space-xs);
+  background: var(--color-background);
+  border-radius: var(--radius-pill);
+}
+
+.segment {
+  flex: 1;
+  min-height: var(--size-min-tap);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-title);
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--easing-standard),
+    color var(--duration-fast) var(--easing-standard);
+}
+
+.segment[aria-checked='true'] {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-sm);
+}

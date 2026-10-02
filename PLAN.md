@@ -267,13 +267,13 @@ Plain, unstyled components only.
 
 ### Milestone 4 — Visual design & motion
 
-- [ ] Redesign every page using the tokens: Today as a card list, a big satisfying complete control with a fill animation, and a day progress ring.
-- [ ] Responsive layout: bottom tab bar on phones, sidebar on desktop. Respect the phone's safe areas (notch and home bar) when installed.
-- [ ] Empty states with warm, encouraging copy. Loading skeletons.
-- [ ] Animations: the complete control fills and springs, the row settles, completed items fade slightly, and pages transition smoothly (View Transitions API where supported, a plain fade elsewhere).
-- [ ] Haptics on Android via `navigator.vibrate`: light on tap, a pattern on completion, and a bigger one for streak milestones (7, 30, 100 days), with a celebration animation.
-- [ ] Support light and dark mode, following the system setting, with a manual override in settings.
-- [ ] Respect "reduce motion" (`prefers-reduced-motion`): replace movement with fades.
+- [x] Redesign every page using the tokens: Today as a card list, a big satisfying complete control with a fill animation, and a day progress ring.
+- [x] Responsive layout: bottom tab bar on phones, sidebar on desktop. Respect the phone's safe areas (notch and home bar) when installed.
+- [x] Empty states with warm, encouraging copy. Loading skeletons.
+- [x] Animations: the complete control fills and springs, the row settles, completed items fade slightly, and pages transition smoothly (View Transitions API where supported, a plain fade elsewhere).
+- [x] Haptics on Android via `navigator.vibrate`: light on tap, a pattern on completion, and a bigger one for streak milestones (7, 30, 100 days), with a celebration animation.
+- [x] Support light and dark mode, following the system setting, with a manual override in settings.
+- [x] Respect "reduce motion" (`prefers-reduced-motion`): replace movement with fades.
 
 **Done when:** I'm happy with how it looks and feels on my real phone and laptop. Decided by screenshot rounds, not tests.
 **Explain to me:** why animating `transform` and `opacity` is smooth but animating `width` or `top` is not, and what makes a tap feel responsive.
