@@ -15,6 +15,36 @@
   border-color: var(--color-accent);
 }
 
+/* A reminder whose time has passed: a soft wash of the habit's colour. */
+.card {
+  position: relative;
+  isolation: isolate;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  /* Cover the (transparent) border too, so no white edge shows around the tint. */
+  inset: calc(var(--size-done-border) * -1);
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--habit);
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--easing-standard);
+}
+
+.card[data-reminder='true']::before {
+  opacity: var(--opacity-tint);
+}
+
+.reminder {
+  display: block;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-title);
+  line-height: var(--line-height-caption);
+}
+
 /* Just completed: a small dip and settle. */
 .card[data-settle='true'] {
   animation: settle var(--duration-slow) var(--easing-standard);
@@ -107,4 +137,9 @@
 
 .minus:active {
   transform: scale(calc(1 - (1 - var(--scale-press)) * var(--motion)));
+}
+
+.reminder svg {
+  margin-right: var(--space-xs);
+  vertical-align: -0.125em;
 }

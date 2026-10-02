@@ -2,7 +2,7 @@
 // and read back with their real types; anything missing or unreadable falls
 // back to its default, so a damaged setting can never crash the app.
 
-import type { FreezeAllowance, Plan, WeekStart } from '../core/index.ts';
+import type { DayKey, FreezeAllowance, Plan, WeekStart } from '../core/index.ts';
 import type { Db } from './adapter.ts';
 
 export type ThemeChoice = 'system' | 'light' | 'dark';
@@ -13,7 +13,12 @@ export const settingDefaults = {
   dayStartHour: 4,
   weekStartsOn: 1 as WeekStart,
   hapticsEnabled: true,
-  remindersEnabled: false,
+  /** Highlight habits whose reminder time has passed (and notify, if allowed). */
+  remindersEnabled: true,
+  /** We explained notifications and asked once; don't ask again. */
+  notificationsAsked: false,
+  /** The day "Not now" was tapped on the install card (it waits 14 days). */
+  installDismissedDay: null as DayKey | null,
   /** ISO timestamp of finishing onboarding, or null. */
   onboardedAt: null as string | null,
   freezeAllowance: null as FreezeAllowance,

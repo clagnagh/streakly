@@ -6,3 +6,4 @@ export * from './streaks.ts';
 export * from './stats.ts';
 export * from './limits.ts';
 export * from './history.ts';
+export * from './reminders.ts';

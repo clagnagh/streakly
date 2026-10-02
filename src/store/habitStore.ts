@@ -25,11 +25,13 @@ import { DbError } from '../db/client.ts';
 import type { HabitInput } from '../db/habitsRepo.ts';
 import type { Repos } from '../db/repos.ts';
 import { settingDefaults, type SettingKey, type Settings } from '../db/settingsRepo.ts';
-import { todayFrom, type Clock } from './clock.ts';
+import { localTimeFrom, todayFrom, type Clock } from './clock.ts';
 
 export type HabitState = {
   loaded: boolean;
   today: DayKey;
+  /** Local time "HH:MM", refreshed with `today` (for reminders). */
+  nowTime: string;
   settings: Settings;
   /** Every habit, archived ones included, in the user's order. */
   habits: HabitRecord[];
@@ -48,7 +50,7 @@ export type Celebration = {
 
 export type HabitActions = {
   load(): Promise<void>;
-  /** Re-reads the clock; moves `today` on if a new day has started. */
+  /** Re-reads the clock: moves `today` on if a new day has started, and updates `nowTime`. */
   refreshToday(): void;
   /** Check habits: done ↔ not done. Defaults to today. */
   toggleComplete(habitId: string, day?: DayKey): Promise<void>;
@@ -130,6 +132,7 @@ export function createHabitStore(repos: Repos, clock: Clock) {
     return {
       loaded: false,
       today: todayFrom(clock, settingDefaults.dayStartHour),
+      nowTime: localTimeFrom(clock),
       settings: settingDefaults,
       habits: [],
       histories: {},
@@ -148,12 +151,14 @@ export function createHabitStore(repos: Repos, clock: Clock) {
           habits,
           histories,
           today: todayFrom(clock, settings.dayStartHour),
+          nowTime: localTimeFrom(clock),
         });
       },
 
       refreshToday() {
         const today = todayFrom(clock, get().settings.dayStartHour);
-        if (today !== get().today) set({ today });
+        const nowTime = localTimeFrom(clock);
+        if (today !== get().today || nowTime !== get().nowTime) set({ today, nowTime });
       },
 
       async toggleComplete(habitId, day = get().today) {

@@ -9,6 +9,7 @@ import {
   habitsForToday,
   isComplete,
   isDueOn,
+  overdueReminders,
   streaks,
   weekRange,
   type DayKey,
@@ -110,3 +111,19 @@ export const activeHabits = (habits: readonly HabitRecord[]) =>
   habits.filter((h) => !h.archivedDay);
 export const archivedHabits = (habits: readonly HabitRecord[]) =>
   habits.filter((h) => h.archivedDay);
+
+/** Ids of habits whose reminder time has passed and that still need doing. */
+export function overdueIds(
+  habits: readonly HabitRecord[],
+  histories: Record<string, HabitHistory>,
+  today: DayKey,
+  nowTime: string,
+  dayStartHour: number,
+  weekStartsOn: WeekStart,
+): Set<string> {
+  return new Set(
+    overdueReminders(habits, histories, today, nowTime, dayStartHour, weekStartsOn).map(
+      (h) => h.id,
+    ),
+  );
+}

@@ -90,6 +90,21 @@ to a custom domain.
   as arguments. Tests pass a fixed clock; e2e tests use `page.clock`.
 - **Screen text** (dates, schedules, streaks) comes from `src/format.ts`. Shared plain button/form
   styles are in `src/components/ui.module.css`.
+- **PWA.** `vite-plugin-pwa` (injectManifest) builds `src/sw.ts`, our own service worker: it
+  precaches every app file (including SQLite's `.wasm` and the font) for offline use, waits for the
+  "Refresh" banner (`UpdateBanner.tsx`, `SKIP_WAITING`) before updating, and opens a habit when a
+  reminder notification is tapped. `src/sw.ts` has its own types (`tsconfig.sw.json`, WebWorker
+  lib); `npm run typecheck` checks both. Icons in `public/icons/` come from `npm run icons`. The
+  manifest and theme-colour meta tags take their colours from the theme tokens (`vite.config.ts`).
+- **Install prompt.** `src/pwa/install.ts` catches `beforeinstallprompt` (imported first in
+  `main.tsx`); `installOffer()` in `src/pwa/installRules.ts` decides when to show the card: only
+  after a first completion, never when installed, snoozed 14 days by "Not now". iPhones get
+  Add to Home Screen steps instead.
+- **Reminders.** `overdueReminders()` (`src/core/reminders.ts`) decides which reminder times have
+  passed, counting from the day-start hour. Today highlights them; `ReminderWatcher` sends a
+  notification only when Streakly is open in the background, once per habit per day. Permission is
+  asked only after the in-app explainer (`NotificationAsk`), the first time a reminder is set.
+  Never promise reminders when the app is closed: that needs web push (a stretch goal).
 - **Hidden dev pages:** `#/dev/tokens` (every token) and `#/dev/db` (counts, sample data, read-only
   SQL box). Unlinked; remove before launch (Milestone 9).
 - Don't edit `LEARNINGS.md` unless asked.

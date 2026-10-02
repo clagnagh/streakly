@@ -227,3 +227,13 @@ describe('celebrations and settings', () => {
     expect(s().today).toBe('2026-09-30');
   });
 });
+
+describe('the clock for reminders', () => {
+  it('keeps the local time up to date', async () => {
+    const { s, setClock } = await setup();
+    expect(s().nowTime).toBe('10:00'); // 09:00 UTC is 10:00 in London (summer time)
+    setClock('2026-09-30T12:15:00Z');
+    s().refreshToday();
+    expect(s().nowTime).toBe('13:15');
+  });
+});

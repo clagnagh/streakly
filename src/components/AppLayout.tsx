@@ -5,7 +5,9 @@ import { applyTheme } from '../feedback/theme.ts';
 import { useActions, useHabitStore } from '../store/context.tsx';
 import { Celebration } from './Celebration.tsx';
 import { DbGate } from './DbGate.tsx';
+import { ReminderWatcher } from './ReminderWatcher.tsx';
 import { TabBar } from './TabBar.tsx';
+import { UpdateBanner } from './UpdateBanner.tsx';
 import styles from './AppLayout.module.css';
 
 const MINUTE = 60_000;
@@ -47,11 +49,13 @@ export function AppLayout() {
         <DbGate>
           <DayRollover />
           <ThemeSync />
+          <ReminderWatcher />
           <Celebration />
           <Outlet />
         </DbGate>
       </main>
       <TabBar />
+      <UpdateBanner />
     </div>
   );
 }

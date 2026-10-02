@@ -8,7 +8,8 @@ import { Page } from '../components/Page.tsx';
 import { ProgressRing } from '../components/ProgressRing.tsx';
 import { formatDay } from '../format.ts';
 import { useHabitStore } from '../store/context.tsx';
-import { activeHabits, dayProgress, todayItems } from '../store/selectors.ts';
+import { activeHabits, dayProgress, overdueIds, todayItems } from '../store/selectors.ts';
+import { InstallCard } from '../components/InstallCard.tsx';
 import ui from '../components/ui.module.css';
 import styles from './Today.module.css';
 
@@ -21,13 +22,24 @@ function dayMessage(done: number, total: number) {
 }
 
 export function Today() {
-  const { habits, histories, today, weekStartsOn } = useHabitStore(
-    useShallow((s) => ({
-      habits: s.habits,
-      histories: s.histories,
-      today: s.today,
-      weekStartsOn: s.settings.weekStartsOn,
-    })),
+  const { habits, histories, today, nowTime, weekStartsOn, dayStartHour, remindersOn } =
+    useHabitStore(
+      useShallow((s) => ({
+        habits: s.habits,
+        histories: s.histories,
+        today: s.today,
+        nowTime: s.nowTime,
+        weekStartsOn: s.settings.weekStartsOn,
+        dayStartHour: s.settings.dayStartHour,
+        remindersOn: s.settings.remindersEnabled,
+      })),
+    );
+  const overdue = useMemo(
+    () =>
+      remindersOn
+        ? overdueIds(habits, histories, today, nowTime, dayStartHour, weekStartsOn)
+        : new Set<string>(),
+    [remindersOn, habits, histories, today, nowTime, dayStartHour, weekStartsOn],
   );
   const items = useMemo(
     () => todayItems(habits, histories, today, weekStartsOn),
@@ -54,7 +66,7 @@ export function Today() {
       {items.length > 0 ? (
         <ul className={styles.list}>
           {items.map((item) => (
-            <HabitCard key={item.habit.id} item={item} />
+            <HabitCard key={item.habit.id} item={item} reminder={overdue.has(item.habit.id)} />
           ))}
         </ul>
       ) : hasHabits ? (
@@ -73,6 +85,8 @@ export function Today() {
           Something you could do even on a busy day. You can always add more later.
         </EmptyState>
       )}
+
+      <InstallCard />
 
       {hasHabits && (
         <Link to="/habit/new" className={styles.addCard} viewTransition>

@@ -1,0 +1,41 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: var(--space-lg);
+  padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--color-text-primary) 35%, transparent);
+  animation: fade var(--duration-normal) var(--easing-standard) both;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+  max-width: calc(var(--size-content-max) * 0.8);
+  padding: var(--space-xl);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  animation: up var(--duration-normal) var(--easing-standard) both;
+}
+
+@keyframes up {
+  from {
+    transform: translateY(calc(var(--space-xl) * var(--motion)));
+  }
+}
+
+:global([data-layout='desktop']) .backdrop {
+  align-items: center;
+}
