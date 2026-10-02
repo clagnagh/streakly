@@ -6,6 +6,8 @@ import { weekdaysInOrder, weekdayShort, displayName } from '../format.ts';
 import { habitColorKeys, vars } from '../theme/index.ts';
 import { useActions, useHabitStore } from '../store/context.tsx';
 import { Page } from '../components/Page.tsx';
+import { NotificationAsk } from '../components/NotificationAsk.tsx';
+import { askForNotifications, notificationState } from '../pwa/notifications.ts';
 import ui from '../components/ui.module.css';
 import styles from './HabitEdit.module.css';
 
@@ -78,6 +80,9 @@ function HabitForm({ habit }: { habit?: HabitRecord }) {
   const navigate = useNavigate();
   const actions = useActions();
   const weekStartsOn = useHabitStore((s) => s.settings.weekStartsOn);
+  const notificationsAsked = useHabitStore((s) => s.settings.notificationsAsked);
+  // Where to go after saving; set while the notification explainer is open.
+  const [askThenGo, setAskThenGo] = useState<string | null>(null);
   const [form, setForm] = useState<Form>(() => formFrom(habit));
   const [errors, setErrors] = useState<Errors>({});
   const [saving, setSaving] = useState(false);
@@ -90,12 +95,19 @@ function HabitForm({ habit }: { habit?: HabitRecord }) {
     if (Object.keys(found).length > 0) return;
     setSaving(true);
     try {
+      let next: string;
       if (habit) {
         await actions.updateHabit(habit.id, toInput(form));
-        navigate(`/habit/${habit.id}`);
+        next = `/habit/${habit.id}`;
       } else {
         await actions.createHabit(toInput(form));
-        navigate('/');
+        next = '/';
+      }
+      // First reminder ever: explain notifications before the browser asks.
+      if (form.reminderTime && !notificationsAsked && notificationState() === 'default') {
+        setAskThenGo(next);
+      } else {
+        navigate(next);
       }
     } catch {
       setErrors({ name: "We couldn't save this habit. Please try again." });
@@ -119,234 +131,251 @@ function HabitForm({ habit }: { habit?: HabitRecord }) {
     navigate('/habits');
   }
 
+  async function finishAsk(allow: boolean) {
+    await actions.setSetting('notificationsAsked', true);
+    if (allow) await askForNotifications();
+    navigate(askThenGo ?? '/');
+  }
+
   return (
-    <form className={styles.form} onSubmit={submit} noValidate>
-      <div className={ui.field}>
-        <label className={ui.label} htmlFor="name">
-          Name
-        </label>
-        <input
-          id="name"
-          className={ui.input}
-          value={form.name}
-          maxLength={NAME_MAX}
-          placeholder="e.g. Meditate"
-          aria-invalid={!!errors.name}
-          aria-describedby={errors.name ? 'name-error' : undefined}
-          onChange={(e) => update({ name: e.target.value })}
+    <>
+      {/* Outside the form, so its buttons can never submit the form again. */}
+      {askThenGo && (
+        <NotificationAsk
+          onAllow={() => void finishAsk(true)}
+          onSkip={() => void finishAsk(false)}
         />
-        {errors.name && (
-          <span id="name-error" className={ui.error}>
-            {errors.name}
-          </span>
-        )}
-      </div>
-
-      <div className={ui.field}>
-        <label className={ui.label} htmlFor="emoji">
-          Emoji <span className={ui.muted}>(optional)</span>
-        </label>
-        <input
-          id="emoji"
-          className={`${ui.input} ${styles.emojiInput}`}
-          value={form.emoji}
-          maxLength={8}
-          onChange={(e) => update({ emoji: e.target.value })}
-        />
-        <div className={ui.row}>
-          {EMOJI_IDEAS.map((e) => (
-            <button
-              key={e}
-              type="button"
-              className={ui.toggle}
-              aria-pressed={form.emoji === e}
-              aria-label={`Use ${e}`}
-              onClick={() => update({ emoji: e })}
-            >
-              {e}
-            </button>
-          ))}
+      )}
+      <form className={styles.form} onSubmit={submit} noValidate>
+        <div className={ui.field}>
+          <label className={ui.label} htmlFor="name">
+            Name
+          </label>
+          <input
+            id="name"
+            className={ui.input}
+            value={form.name}
+            maxLength={NAME_MAX}
+            placeholder="e.g. Meditate"
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? 'name-error' : undefined}
+            onChange={(e) => update({ name: e.target.value })}
+          />
+          {errors.name && (
+            <span id="name-error" className={ui.error}>
+              {errors.name}
+            </span>
+          )}
         </div>
-      </div>
 
-      <fieldset className={ui.field}>
-        <legend className={ui.label}>Colour</legend>
-        <div className={ui.row}>
-          {habitColorKeys.map((key) => (
-            <button
-              key={key}
-              type="button"
-              className={styles.swatch}
-              style={{ background: vars.habit[key] }}
-              aria-pressed={form.colorKey === key}
-              aria-label={key}
-              onClick={() => update({ colorKey: key })}
-            />
-          ))}
-        </div>
-      </fieldset>
-
-      <fieldset className={ui.field}>
-        <legend className={ui.label}>Type</legend>
-        <div className={ui.row}>
-          <button
-            type="button"
-            className={ui.toggle}
-            aria-pressed={form.type === 'check'}
-            onClick={() => update({ type: 'check' })}
-          >
-            Done once a day
-          </button>
-          <button
-            type="button"
-            className={ui.toggle}
-            aria-pressed={form.type === 'count'}
-            onClick={() => update({ type: 'count' })}
-          >
-            Count up to a target
-          </button>
-        </div>
-        {form.type === 'count' && (
+        <div className={ui.field}>
+          <label className={ui.label} htmlFor="emoji">
+            Emoji <span className={ui.muted}>(optional)</span>
+          </label>
+          <input
+            id="emoji"
+            className={`${ui.input} ${styles.emojiInput}`}
+            value={form.emoji}
+            maxLength={8}
+            onChange={(e) => update({ emoji: e.target.value })}
+          />
           <div className={ui.row}>
-            <label className={ui.muted} htmlFor="target">
-              Target
-            </label>
-            <input
-              id="target"
-              className={`${ui.input} ${styles.number}`}
-              type="number"
-              inputMode="numeric"
-              min={1}
-              max={99}
-              value={form.target}
-              aria-invalid={!!errors.target}
-              onChange={(e) => update({ target: e.target.value })}
-            />
-            <label className={ui.muted} htmlFor="unit">
-              Unit
-            </label>
-            <input
-              id="unit"
-              className={ui.input}
-              value={form.unit}
-              placeholder="glasses"
-              maxLength={20}
-              onChange={(e) => update({ unit: e.target.value })}
-            />
-          </div>
-        )}
-        {errors.target && <span className={ui.error}>{errors.target}</span>}
-      </fieldset>
-
-      <fieldset className={ui.field}>
-        <legend className={ui.label}>How often</legend>
-        <div className={ui.row}>
-          {(
-            [
-              ['daily', 'Every day'],
-              ['weekdays', 'Specific days'],
-              ['timesPerWeek', 'Times a week'],
-            ] as const
-          ).map(([kind, label]) => (
-            <button
-              key={kind}
-              type="button"
-              className={ui.toggle}
-              aria-pressed={form.scheduleKind === kind}
-              onClick={() => update({ scheduleKind: kind })}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        {form.scheduleKind === 'weekdays' && (
-          <div className={ui.row} role="group" aria-label="Days">
-            {weekdaysInOrder(weekStartsOn).map((d) => (
+            {EMOJI_IDEAS.map((e) => (
               <button
-                key={d}
+                key={e}
                 type="button"
                 className={ui.toggle}
-                aria-pressed={form.days.includes(d)}
-                onClick={() =>
-                  update({
-                    days: form.days.includes(d)
-                      ? form.days.filter((x) => x !== d)
-                      : [...form.days, d],
-                  })
-                }
+                aria-pressed={form.emoji === e}
+                aria-label={`Use ${e}`}
+                onClick={() => update({ emoji: e })}
               >
-                {weekdayShort(d)}
+                {e}
               </button>
             ))}
           </div>
-        )}
-        {form.scheduleKind === 'timesPerWeek' && (
-          <div className={ui.row}>
-            <input
-              id="times"
-              className={`${ui.input} ${styles.number}`}
-              type="number"
-              inputMode="numeric"
-              min={1}
-              max={6}
-              value={form.times}
-              aria-label="Times a week"
-              aria-invalid={!!errors.times}
-              onChange={(e) => update({ times: e.target.value })}
-            />
-            <span className={ui.muted}>times a week, any days</span>
-          </div>
-        )}
-        {(errors.days || errors.times) && (
-          <span className={ui.error}>{errors.days ?? errors.times}</span>
-        )}
-      </fieldset>
+        </div>
 
-      <div className={ui.field}>
-        <label className={ui.label} htmlFor="reminder">
-          Reminder <span className={ui.muted}>(optional)</span>
-        </label>
-        <div className={ui.row}>
-          <input
-            id="reminder"
-            className={ui.input}
-            type="time"
-            value={form.reminderTime}
-            onChange={(e) => update({ reminderTime: e.target.value })}
-          />
-          {form.reminderTime && (
+        <fieldset className={ui.field}>
+          <legend className={ui.label}>Colour</legend>
+          <div className={ui.row}>
+            {habitColorKeys.map((key) => (
+              <button
+                key={key}
+                type="button"
+                className={styles.swatch}
+                style={{ background: vars.habit[key] }}
+                aria-pressed={form.colorKey === key}
+                aria-label={key}
+                onClick={() => update({ colorKey: key })}
+              />
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset className={ui.field}>
+          <legend className={ui.label}>Type</legend>
+          <div className={ui.row}>
             <button
               type="button"
-              className={ui.button}
-              onClick={() => update({ reminderTime: '' })}
+              className={ui.toggle}
+              aria-pressed={form.type === 'check'}
+              onClick={() => update({ type: 'check' })}
             >
-              No reminder
+              Done once a day
             </button>
+            <button
+              type="button"
+              className={ui.toggle}
+              aria-pressed={form.type === 'count'}
+              onClick={() => update({ type: 'count' })}
+            >
+              Count up to a target
+            </button>
+          </div>
+          {form.type === 'count' && (
+            <div className={ui.row}>
+              <label className={ui.muted} htmlFor="target">
+                Target
+              </label>
+              <input
+                id="target"
+                className={`${ui.input} ${styles.number}`}
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={99}
+                value={form.target}
+                aria-invalid={!!errors.target}
+                onChange={(e) => update({ target: e.target.value })}
+              />
+              <label className={ui.muted} htmlFor="unit">
+                Unit
+              </label>
+              <input
+                id="unit"
+                className={ui.input}
+                value={form.unit}
+                placeholder="glasses"
+                maxLength={20}
+                onChange={(e) => update({ unit: e.target.value })}
+              />
+            </div>
           )}
-        </div>
-        <span className={ui.muted}>Reminders arrive in a later update.</span>
-      </div>
+          {errors.target && <span className={ui.error}>{errors.target}</span>}
+        </fieldset>
 
-      <div className={ui.row}>
-        <button type="submit" className={ui.primary} disabled={saving}>
-          {habit ? 'Save changes' : 'Add habit'}
-        </button>
-        <Link to={habit ? `/habit/${habit.id}` : '/'} className={ui.button}>
-          Cancel
-        </Link>
-      </div>
+        <fieldset className={ui.field}>
+          <legend className={ui.label}>How often</legend>
+          <div className={ui.row}>
+            {(
+              [
+                ['daily', 'Every day'],
+                ['weekdays', 'Specific days'],
+                ['timesPerWeek', 'Times a week'],
+              ] as const
+            ).map(([kind, label]) => (
+              <button
+                key={kind}
+                type="button"
+                className={ui.toggle}
+                aria-pressed={form.scheduleKind === kind}
+                onClick={() => update({ scheduleKind: kind })}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {form.scheduleKind === 'weekdays' && (
+            <div className={ui.row} role="group" aria-label="Days">
+              {weekdaysInOrder(weekStartsOn).map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  className={ui.toggle}
+                  aria-pressed={form.days.includes(d)}
+                  onClick={() =>
+                    update({
+                      days: form.days.includes(d)
+                        ? form.days.filter((x) => x !== d)
+                        : [...form.days, d],
+                    })
+                  }
+                >
+                  {weekdayShort(d)}
+                </button>
+              ))}
+            </div>
+          )}
+          {form.scheduleKind === 'timesPerWeek' && (
+            <div className={ui.row}>
+              <input
+                id="times"
+                className={`${ui.input} ${styles.number}`}
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={6}
+                value={form.times}
+                aria-label="Times a week"
+                aria-invalid={!!errors.times}
+                onChange={(e) => update({ times: e.target.value })}
+              />
+              <span className={ui.muted}>times a week, any days</span>
+            </div>
+          )}
+          {(errors.days || errors.times) && (
+            <span className={ui.error}>{errors.days ?? errors.times}</span>
+          )}
+        </fieldset>
 
-      {habit && (
-        <div className={`${ui.row} ${styles.dangerZone}`}>
-          <button type="button" className={ui.button} onClick={archive}>
-            {habit.archivedDay ? 'Restore' : 'Archive'}
-          </button>
-          <button type="button" className={ui.danger} onClick={remove}>
-            Delete
-          </button>
+        <div className={ui.field}>
+          <label className={ui.label} htmlFor="reminder">
+            Reminder <span className={ui.muted}>(optional)</span>
+          </label>
+          <div className={ui.row}>
+            <input
+              id="reminder"
+              className={ui.input}
+              type="time"
+              value={form.reminderTime}
+              onChange={(e) => update({ reminderTime: e.target.value })}
+            />
+            {form.reminderTime && (
+              <button
+                type="button"
+                className={ui.button}
+                onClick={() => update({ reminderTime: '' })}
+              >
+                No reminder
+              </button>
+            )}
+          </div>
+          <span className={ui.muted}>
+            After this time, the habit is gently highlighted on Today until it's done.
+          </span>
         </div>
-      )}
-    </form>
+
+        <div className={ui.row}>
+          <button type="submit" className={ui.primary} disabled={saving}>
+            {habit ? 'Save changes' : 'Add habit'}
+          </button>
+          <Link to={habit ? `/habit/${habit.id}` : '/'} className={ui.button}>
+            Cancel
+          </Link>
+        </div>
+
+        {habit && (
+          <div className={`${ui.row} ${styles.dangerZone}`}>
+            <button type="button" className={ui.button} onClick={archive}>
+              {habit.archivedDay ? 'Restore' : 'Archive'}
+            </button>
+            <button type="button" className={ui.danger} onClick={remove}>
+              Delete
+            </button>
+          </div>
+        )}
+      </form>
+    </>
   );
 }
 

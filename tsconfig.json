@@ -5,7 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "types": ["vite/client", "node"],
+    "types": ["vite/client", "node", "vite-plugin-pwa/react"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noFallthroughCasesInSwitch": true,
@@ -19,5 +19,6 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src", "tests", "e2e", "*.ts"]
+  "include": ["src", "tests", "e2e", "scripts", "*.ts"],
+  "exclude": ["src/sw.ts"]
 }

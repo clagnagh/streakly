@@ -275,17 +275,17 @@ Plain, unstyled components only.
 - [x] Support light and dark mode, following the system setting, with a manual override in settings.
 - [x] Respect "reduce motion" (`prefers-reduced-motion`): replace movement with fades.
 
-**Done when:** I'm happy with how it looks and feels on my real phone and laptop. Decided by screenshot rounds, not tests.
+**Done when:** I'm happy with how it looks and feels on my real phone and laptop. Decided by screenshot rounds, not tests. ✅ Done after design rounds 1 and 2 (PRs #6 and #7).
 **Explain to me:** why animating `transform` and `opacity` is smooth but animating `width` or `top` is not, and what makes a tap feel responsive.
 **🎓 My checkpoint (design feedback experiment):** I'll first ask _"make Today look nicer"_, then ask for something specific like _"increase card padding to spacing.lg, drop the shadow, use a 2 px accent border on completed rows"_. I'll write the difference in the results into `LEARNINGS.md`.
 
 ### Milestone 5 — Installable app & reminders
 
-- [ ] Web manifest (name, icons, theme colour, `display: standalone`) and a service worker that caches the whole app, so it opens with no network.
-- [ ] An "Install Streakly" prompt: the browser's install button on Android/desktop Chrome, and "Share → Add to Home Screen" instructions on iPhone. Shown after the user has completed a habit, not on first visit.
-- [ ] "A new version is ready — refresh" banner when the service worker updates.
-- [ ] **In-app reminders:** when the app is opened or brought back to the front, gently highlight habits whose reminder time has passed and that aren't done yet. Optionally show a browser notification while the app is open, asking permission only when the first reminder is set, and explaining why first.
-- [ ] Settings: a reminders toggle, and a clear note about what web reminders can and can't do.
+- [x] Web manifest (name, icons, theme colour, `display: standalone`) and a service worker that caches the whole app, so it opens with no network.
+- [x] An "Install Streakly" prompt: the browser's install button on Android/desktop Chrome, and "Share → Add to Home Screen" instructions on iPhone. Shown after the user has completed a habit, not on first visit.
+- [x] "A new version is ready — refresh" banner when the service worker updates.
+- [x] **In-app reminders:** when the app is opened or brought back to the front, gently highlight habits whose reminder time has passed and that aren't done yet. Optionally show a browser notification while the app is open, asking permission only when the first reminder is set, and explaining why first.
+- [x] Settings: a reminders toggle, and a clear note about what web reminders can and can't do.
 
 **Why reminders are limited on the web:** a web app can't schedule a notification for later while it's closed. That needs **web push**, which requires a server to send each message, which breaks the "no server, no account" design. Web push is a stretch goal (section 8).
 

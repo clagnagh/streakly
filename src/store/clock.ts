@@ -17,3 +17,21 @@ export const systemClock: Clock = {
 export function todayFrom(clock: Clock, dayStartHour: number): DayKey {
   return dayKey(clock.now(), dayStartHour, clock.timeZone());
 }
+
+const timeFormatters = new Map<string, Intl.DateTimeFormat>();
+
+/** Local wall-clock time "HH:MM" in the device's time zone. */
+export function localTimeFrom(clock: Clock): string {
+  const zone = clock.timeZone();
+  let f = timeFormatters.get(zone);
+  if (!f) {
+    f = new Intl.DateTimeFormat('en-GB', {
+      timeZone: zone,
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    });
+    timeFormatters.set(zone, f);
+  }
+  return f.format(clock.now());
+}

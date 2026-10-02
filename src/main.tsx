@@ -4,6 +4,8 @@ import { RouterProvider } from 'react-router/dom';
 import { buildThemeCss } from './theme/index.ts';
 import { router } from './router.tsx';
 import { applySavedThemeEarly } from './feedback/theme.ts';
+// Listen for the browser's install offer before anything else (it can fire early).
+import './pwa/install.ts';
 import './global.css';
 
 // Put the design-token variables on the page before anything renders.

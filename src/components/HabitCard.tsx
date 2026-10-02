@@ -6,11 +6,11 @@ import { useActions, useHabitStore } from '../store/context.tsx';
 import type { TodayItem } from '../store/selectors.ts';
 import { habitColor } from '../theme/index.ts';
 import { CompleteButton } from './CompleteButton.tsx';
-import { MinusIcon } from './Icons.tsx';
+import { BellIcon, MinusIcon } from './Icons.tsx';
 import styles from './HabitCard.module.css';
 
 /** One habit on Today: badge, name, progress notes and the complete button. */
-export function HabitCard({ item }: { item: TodayItem }) {
+export function HabitCard({ item, reminder }: { item: TodayItem; reminder?: boolean }) {
   const { habit, week, streak, count, done } = item;
   const { incrementCount } = useActions();
   const hapticsOn = useHabitStore((s) => s.settings.hapticsEnabled);
@@ -35,6 +35,7 @@ export function HabitCard({ item }: { item: TodayItem }) {
       className={styles.card}
       style={{ '--habit': habitColor(habit.colorKey) } as CSSProperties}
       data-done={done}
+      data-reminder={!!reminder && !done}
       data-settle={settle}
       onAnimationEnd={(e) => e.target === e.currentTarget && setSettle(false)}
       data-testid="today-row"
@@ -46,6 +47,12 @@ export function HabitCard({ item }: { item: TodayItem }) {
         </span>
         <span className={styles.text}>
           <span className={styles.name}>{displayName(habit.name)}</span>
+          {reminder && !done && habit.reminderTime && (
+            <span className={styles.reminder}>
+              <BellIcon />
+              {habit.reminderTime} · when you're ready
+            </span>
+          )}
           {notes.length > 0 && <span className={styles.meta}>{notes.join(' · ')}</span>}
         </span>
       </Link>
