@@ -11,3 +11,31 @@
   margin-top: calc(var(--space-md) * -1);
   color: var(--color-text-secondary);
 }
+
+/* "New habit" as the last card in the list: a dashed outline of where the next habit goes. */
+.addCard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-height: var(--size-complete-button);
+  margin-top: calc(var(--space-xl) * -1 + var(--space-md));
+  border: calc(var(--size-border) * 2) dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-title);
+  text-decoration: none;
+  transition:
+    border-color var(--duration-fast) var(--easing-standard),
+    color var(--duration-fast) var(--easing-standard),
+    transform var(--duration-fast) var(--easing-standard);
+}
+
+.addCard:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.addCard:active {
+  transform: scale(calc(1 - (1 - var(--scale-settle)) * var(--motion)));
+}

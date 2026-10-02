@@ -9,6 +9,7 @@ import {
   streakLength,
   weekdayShort,
   weekdaysInOrder,
+  displayName,
 } from '../format.ts';
 import { weekdayOf } from '../core/index.ts';
 import type { CSSProperties } from 'react';
@@ -63,7 +64,7 @@ export function HabitDetail() {
 
   return (
     <Page
-      title={`${habit.emoji ? `${habit.emoji} ` : ''}${habit.name}`}
+      title={`${habit.emoji ? `${habit.emoji} ` : ''}${displayName(habit.name)}`}
       subtitle={`${scheduleLabel(habit.schedule, weekStartsOn)}${habit.archivedDay ? ' · Archived' : ''}`}
     >
       <div className={styles.stats}>

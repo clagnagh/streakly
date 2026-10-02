@@ -2,7 +2,7 @@ import { useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { Link } from 'react-router';
 import { Page } from '../components/Page.tsx';
 import type { HabitRecord } from '../core/index.ts';
-import { scheduleLabel } from '../format.ts';
+import { scheduleLabel, displayName } from '../format.ts';
 import { useActions, useHabitStore } from '../store/context.tsx';
 import { activeHabits, archivedHabits } from '../store/selectors.ts';
 import { habitColor } from '../theme/index.ts';
@@ -92,7 +92,7 @@ export function Habits() {
               >
                 <button
                   className={styles.handle}
-                  aria-label={`Drag to reorder ${h.name}`}
+                  aria-label={`Drag to reorder ${displayName(h.name)}`}
                   onPointerDown={(e) => drag.onPointerDown(e, id)}
                   onPointerMove={drag.onPointerMove}
                   onPointerUp={drag.onPointerUp}
@@ -109,7 +109,7 @@ export function Habits() {
                     {h.emoji || h.name.slice(0, 1).toUpperCase()}
                   </span>
                   <span className={styles.text}>
-                    <span className={styles.title}>{h.name}</span>
+                    <span className={styles.title}>{displayName(h.name)}</span>
                     <span className={ui.muted}>{scheduleLabel(h.schedule, weekStartsOn)}</span>
                   </span>
                 </Link>
@@ -117,7 +117,7 @@ export function Habits() {
                 <span className={styles.arrows}>
                   <button
                     className={ui.iconButton}
-                    aria-label={`Move ${h.name} up`}
+                    aria-label={`Move ${displayName(h.name)} up`}
                     disabled={index === 0}
                     onClick={() => void reorderHabits(move(ids, index, -1))}
                   >
@@ -125,7 +125,7 @@ export function Habits() {
                   </button>
                   <button
                     className={ui.iconButton}
-                    aria-label={`Move ${h.name} down`}
+                    aria-label={`Move ${displayName(h.name)} down`}
                     disabled={index === ids.length - 1}
                     onClick={() => void reorderHabits(move(ids, index, 1))}
                   >
@@ -162,7 +162,7 @@ export function Habits() {
                   >
                     {h.emoji || h.name.slice(0, 1).toUpperCase()}
                   </span>
-                  <span className={styles.title}>{h.name}</span>
+                  <span className={styles.title}>{displayName(h.name)}</span>
                 </Link>
                 <button className={ui.button} onClick={() => void unarchiveHabit(h.id)}>
                   Restore

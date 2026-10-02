@@ -1,3 +1,4 @@
+import { displayName } from '../format.ts';
 import type { DayKey, HabitRecord } from '../core/index.ts';
 import { useActions } from '../store/context.tsx';
 import ui from './ui.module.css';
@@ -20,7 +21,7 @@ export function HabitControl({ habit, count, done, day }: Props) {
       <button
         className={ui.toggle}
         aria-pressed={done}
-        aria-label={`${habit.name}: ${done ? 'done' : 'not done'}`}
+        aria-label={`${displayName(habit.name)}: ${done ? 'done' : 'not done'}`}
         onClick={() => void toggleComplete(habit.id, day)}
       >
         {done ? '✓ Done' : 'Mark done'}
@@ -29,7 +30,7 @@ export function HabitControl({ habit, count, done, day }: Props) {
   }
 
   return (
-    <div className={styles.stepper} role="group" aria-label={`${habit.name} count`}>
+    <div className={styles.stepper} role="group" aria-label={`${displayName(habit.name)} count`}>
       <button
         className={ui.iconButton}
         aria-label={`One less ${habit.unit ?? ''}`.trim()}

@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import type { HabitRecord, Weekday } from '../core/index.ts';
 import type { HabitInput } from '../db/habitsRepo.ts';
-import { weekdaysInOrder, weekdayShort } from '../format.ts';
+import { weekdaysInOrder, weekdayShort, displayName } from '../format.ts';
 import { habitColorKeys, vars } from '../theme/index.ts';
 import { useActions, useHabitStore } from '../store/context.tsx';
 import { Page } from '../components/Page.tsx';
@@ -106,7 +106,7 @@ function HabitForm({ habit }: { habit?: HabitRecord }) {
   async function remove() {
     if (!habit) return;
     const ok = window.confirm(
-      `Delete "${habit.name}" and all its history? This can't be undone. (Archiving keeps the history.)`,
+      `Delete "${displayName(habit.name)}" and all its history? This can't be undone. (Archiving keeps the history.)`,
     );
     if (!ok) return;
     await actions.deleteHabit(habit.id);
