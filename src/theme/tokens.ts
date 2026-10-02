@@ -46,6 +46,8 @@ export const sizes = {
   border: 1,
   /** Keyboard focus outline. */
   focusRing: 2,
+  /** The accent border on completed habit cards. */
+  doneBorder: 2,
   /** The round complete button on Today. */
   completeButton: 56,
   /** Stroke of the complete button's progress ring. */

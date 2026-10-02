@@ -30,7 +30,7 @@
   padding: var(--space-lg);
   background: var(--color-surface);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  border: var(--size-done-border) solid transparent;
 }
 
 .badge {
